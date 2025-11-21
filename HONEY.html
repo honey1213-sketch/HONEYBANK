@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Honey Bank - Dashboard</title>
+    <style>
+        /* CSS Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7f9;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+        header {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        header h1 {
+            color: #0056b3;
+            margin: 0;
+        }
+        header p {
+            color: #555;
+            font-size: 1.1em;
+            margin-top: 5px;
+        }
+        .balance-card {
+            background-color: #007bff;
+            color: white;
+            padding: 30px;
+            border-radius: 8px;
+            margin: 30px 0;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .balance-card h2 {
+            margin: 0 0 10px;
+            font-size: 1em;
+            opacity: 0.8;
+        }
+        .balance-amount {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 0;
+        }
+        .transactions-section h2 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .transaction-list {
+            list-style: none;
+            padding: 0;
+        }
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+        .transaction-details {
+            display: flex;
+            flex-direction: column;
+        }
+        .transaction-name {
+            font-weight: bold;
+            color: #333;
+        }
+        .transaction-date {
+            font-size: 0.8em;
+            color: #6c757d;
+            margin-top: 4px;
+        }
+        .transaction-amount {
+            font-size: 1.1em;
+            font-weight: bold;
+            text-align: right;
+        }
+        .amount-credit {
+            color: #28a745; /* Green for incoming */
+        }
+        .amount-debit {
+            color: #dc3545; /* Red for outgoing */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Welcome to Honey Bank Account</h1>
+        </header>
+
+        <section class="balance-card">
+            <h2>Current Balance</h2>
+            <p class="balance-amount" id="balanceAmount">₹ 130.00</p>
+        </section>
+
+        <section class="transactions-section">
+            <h2>Recent Transactions</h2>
+            <ul class="transaction-list" id="transactionList">
+                <!-- Transactions added dynamically via JavaScript -->
+            </ul>
+        </section>
+    </div>
+
+    <script>
+        // JavaScript for dynamic data
+        const transactionListElement = document.getElementById('transactionList');
+
+        // Sample data for transactions (नमूना डेटा)
+        const transactions = [
+            { name: 'UNKNOWN TRANSACTION', type: 'credit', amount: 30.00, date: 'NOVEMBER 15, 2025' },
+            { name: 'UNKNOWN TRANSACTION', type: 'credit', amount: 50.00, date: 'NOVEMBER 16, 2025' },
+            { name: 'UNKNOWN TRANSACTION', type: 'credit', amount: 50.00, date: 'NOVEMBER 14, 2025' },
+        ];
+
+        function renderTransactions() {
+            transactions.forEach(transaction => {
+                const li = document.createElement('li');
+                li.classList.add('transaction-item');
+
+                const amountClass = transaction.type === 'credit' ? 'amount-credit' : 'amount-debit';
+                const sign = transaction.type === 'credit' ? '+' : '-';
+
+                li.innerHTML = `
+                    <div class="transaction-details">
+                        <span class="transaction-name">${transaction.name}</span>
+                        <span class="transaction-date">${transaction.date}</span>
+                    </div>
+                    <div class="transaction-amount ${amountClass}">
+                        ${sign} ₹ ${transaction.amount.toLocaleString('en-IN')}
+                    </div>
+                `;
+                transactionListElement.appendChild(li);
+            });
+        }
+
+        // Load transactions when the page loads
+        document.addEventListener('DOMContentLoaded', (event) => {
+            renderTransactions();
+        });
+    </script>
+</body>
+</html>
