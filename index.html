@@ -96,6 +96,29 @@
         .amount-debit {
             color: #dc3545; /* Red for outgoing */
         }
+        /* नए बटन के लिए CSS */
+        .button-group {
+            text-align: center;
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+        .action-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 0 10px;
+            transition: background-color 0.3s;
+        }
+        .action-btn.withdraw {
+            background-color: #dc3545;
+        }
+        .action-btn:hover {
+            opacity: 0.9;
+        }
     </style>
 </head>
 <body>
@@ -109,6 +132,12 @@
             <p class="balance-amount" id="balanceAmount">₹ 130.00</p>
         </section>
 
+        <!-- नए बटन यहाँ हैं -->
+        <section class="button-group">
+            <button class="action-btn" onclick="handleDeposit()">Deposit</button>
+            <button class="action-btn withdraw" onclick="handleWithdraw()">Withdraw</button>
+        </section>
+
         <section class="transactions-section">
             <h2>Recent Transactions</h2>
             <ul class="transaction-list" id="transactionList">
@@ -118,13 +147,13 @@
     </div>
 
     <script>
-        // JavaScript for dynamic data
+        // JavaScript for dynamic data and button functions
         const transactionListElement = document.getElementById('transactionList');
 
         // Sample data for transactions (नमूना डेटा)
         const transactions = [
-            { name: 'UNKNOWN TRANSACTION', type: 'credit', amount: 30.00, date: 'NOVEMBER 17, 2025' },
-            { name: 'UNKNOWN TRANSACTION', type: 'credit', amount: 50.00, date: 'NOVEMBER 15, 2025' },
+            { name: 'UNKNOWN TRANSACTION', type: 'credit', amount: 30.00, date: 'NOVEMBER 15, 2025' },
+            { name: 'UNKNOWN TRANSACTION', type: 'credit', amount: 50.00, date: 'NOVEMBER 16, 2025' },
             { name: 'UNKNOWN TRANSACTION', type: 'credit', amount: 50.00, date: 'NOVEMBER 14, 2025' },
         ];
 
@@ -153,6 +182,15 @@
         document.addEventListener('DOMContentLoaded', (event) => {
             renderTransactions();
         });
+
+        // बटन के लिए नई JavaScript फंक्शन्स
+        function handleDeposit() {
+            alert('DEPOSIT OR WITHDRAW IN CASH');
+        }
+
+        function handleWithdraw() {
+            alert('DEPOSIT OR WITHDRAW IN CASH');
+        }
     </script>
 </body>
 </html>
