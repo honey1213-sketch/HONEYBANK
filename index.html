@@ -5,192 +5,225 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Honey Bank - Dashboard</title>
     <style>
-        /* CSS Styles */
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f7f9;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #dce6ff, #ffffff);
             margin: 0;
             padding: 0;
             color: #333;
         }
         .container {
-            max-width: 900px;
+            max-width: 950px;
             margin: 50px auto;
-            padding: 20px;
+            padding: 25px;
             background-color: #fff;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            border-radius: 10px;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.2);
+            border-radius: 12px;
         }
         header {
             text-align: center;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e3e3e3;
         }
         header h1 {
-            color: #0056b3;
             margin: 0;
+            font-size: 2em;
+            color: #0049b9;
         }
         header p {
-            color: #555;
-            font-size: 1.1em;
-            margin-top: 5px;
+            margin: 6px 0 0;
+            font-size: 1.05em;
+            color: #444;
         }
+
         .balance-card {
-            background-color: #007bff;
+            background: linear-gradient(135deg, #0069ff, #003f9e);
             color: white;
-            padding: 30px;
-            border-radius: 8px;
+            padding: 35px;
+            border-radius: 12px;
             margin: 30px 0;
             text-align: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-        .balance-card h2 {
-            margin: 0 0 10px;
-            font-size: 1em;
-            opacity: 0.8;
         }
         .balance-amount {
-            font-size: 3em;
+            font-size: 3.2em;
             font-weight: bold;
-            margin: 0;
         }
-        .transactions-section h2 {
-            color: #333;
-            margin-bottom: 15px;
+
+        .button-group {
+            text-align: center;
+            margin: 30px 0;
         }
-        .transaction-list {
-            list-style: none;
-            padding: 0;
+        .action-btn {
+            background-color: #12b259;
+            border: none;
+            padding: 12px 30px;
+            color: white;
+            cursor: pointer;
+            font-size: 1.05em;
+            border-radius: 6px;
+            margin: 0 12px;
+            transition: 0.3s;
         }
+        .withdraw { background-color: #d41f1f; }
+        .action-btn:hover { opacity: 0.85; }
+
+        .transactions-section h2 { margin-bottom: 14px; }
         .transaction-item {
             display: flex;
             justify-content: space-between;
-            align-items: center;
             padding: 15px 0;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid #ececec;
         }
-        .transaction-item:last-child {
-            border-bottom: none;
+        .amount-credit { color: #0db152; }
+        .amount-debit { color: #d92424; }
+
+        .rules-box {
+            background-color: #f2f5ff;
+            border-left: 6px solid #0346b3;
+            padding: 20px;
+            border-radius: 6px;
+            margin-top: 40px;
         }
-        .transaction-details {
-            display: flex;
-            flex-direction: column;
+        .rules-box h3 { margin: 0 0 12px; }
+
+        /* Error Popup */
+        .popup, .crashScreen {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
         }
-        .transaction-name {
-            font-weight: bold;
-            color: #333;
+        .popup {
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
         }
-        .transaction-date {
-            font-size: 0.8em;
-            color: #6c757d;
-            margin-top: 4px;
-        }
-        .transaction-amount {
-            font-size: 1.1em;
-            font-weight: bold;
-            text-align: right;
-        }
-        .amount-credit {
-            color: #28a745; /* Green for incoming */
-        }
-        .amount-debit {
-            color: #dc3545; /* Red for outgoing */
-        }
-        /* नए बटन के लिए CSS */
-        .button-group {
+        .popup-content {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            width: 360px;
             text-align: center;
-            margin-top: 30px;
-            margin-bottom: 30px;
+            box-shadow: 0px 4px 18px rgba(0,0,0,0.3);
         }
-        .action-btn {
-            background-color: #28a745;
+        .popup-content h2 { color: #d10000; }
+        .close-btn {
+            margin-top: 12px;
+            padding: 9px 20px;
+            background: #0069ff;
             color: white;
-            padding: 10px 20px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 1em;
-            margin: 0 10px;
-            transition: background-color 0.3s;
         }
-        .action-btn.withdraw {
-            background-color: #dc3545;
+
+        /* Crash Screen */
+        .crashScreen {
+            display: none;
+            background: black;
+            color: red;
+            font-size: 2.2em;
+            font-weight: bold;
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
         }
-        .action-btn:hover {
-            opacity: 0.9;
+        .crashScreen p {
+            font-size: 1.2em;
+            margin-top: 15px;
+            color: #b60000;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Welcome to Honey Bank Account</h1>
-        </header>
+<div class="container" id="mainContent">
 
-        <section class="balance-card">
-            <h2>Current Balance</h2>
-            <p class="balance-amount" id="balanceAmount">₹ 130.00</p>
-        </section>
+    <header>
+        <h1>Honey Bank Account</h1>
+        <p>Account Holder: <strong>Honey</strong></p>
+    </header>
 
-        <!-- नए बटन यहाँ हैं -->
-        <section class="button-group">
-            <button class="action-btn" onclick="handleDeposit()">Deposit</button>
-            <button class="action-btn withdraw" onclick="handleWithdraw()">Withdraw</button>
-        </section>
+    <section class="balance-card">
+        <h2>Current Balance</h2>
+        <p class="balance-amount">₹ 130.00</p>
+    </section>
 
-        <section class="transactions-section">
-            <h2>Recent Transactions</h2>
-            <ul class="transaction-list" id="transactionList">
-                <!-- Transactions added dynamically via JavaScript -->
-            </ul>
-        </section>
+    <section class="button-group">
+        <button class="action-btn" onclick="attemptUnauthorized()">Deposit</button>
+        <button class="action-btn withdraw" onclick="attemptUnauthorized()">Withdraw</button>
+    </section>
+
+    <section class="transactions-section">
+        <h2>Recent Transactions</h2>
+        <ul id="transactionList"></ul>
+    </section>
+
+    <div class="rules-box">
+        <h3>⚠ Security Rules</h3>
+        <ul>
+            <li>Admin के अलावा कोई transaction नहीं कर सकता।</li>
+            <li>Balance में बदलाव सिर्फ Admin करेगा।</li>
+            <li>बार-बार कोशिश करने पर सिस्टम Crash हो जाएगा।</li>
+        </ul>
     </div>
+</div>
 
-    <script>
-        // JavaScript for dynamic data and button functions
-        const transactionListElement = document.getElementById('transactionList');
+<!-- Error Popup -->
+<div class="popup" id="errorPopup">
+    <div class="popup-content">
+        <h2>Access Denied ❌</h2>
+        <p>Only Admin can perform Deposit or Withdraw.</p>
+        <button class="close-btn" onclick="closePopup()">OK</button>
+    </div>
+</div>
 
-        // Sample data for transactions (नमूना डेटा)
-        const transactions = [
-            { name: 'UNKNOWN TRANSACTION', type: 'credit', amount: 30.00, date: 'NOVEMBER 17, 2025' },
-            { name: 'UNKNOWN TRANSACTION', type: 'credit', amount: 50.00, date: 'NOVEMBER 15, 2025' },
-            { name: 'UNKNOWN TRANSACTION', type: 'credit', amount: 50.00, date: 'NOVEMBER 14, 2025' },
-        ];
+<!-- Crash Screen -->
+<div class="crashScreen" id="crashScreen">
+    WEBSITE CRASHED ⚠
+    <p>Multiple unauthorized attempts detected.</p>
+</div>
 
-        function renderTransactions() {
-            transactions.forEach(transaction => {
-                const li = document.createElement('li');
-                li.classList.add('transaction-item');
+<script>
+    let attempts = 0;
+    const transactionList = document.getElementById('transactionList');
 
-                const amountClass = transaction.type === 'credit' ? 'amount-credit' : 'amount-debit';
-                const sign = transaction.type === 'credit' ? '+' : '-';
+    const transactions = [
+        { name: 'UNKNOWN TRANSACTION', type: 'credit', amount: 30.00, date: 'NOVEMBER 17, 2025' },
+        { name: 'UNKNOWN TRANSACTION', type: 'credit', amount: 50.00, date: 'NOVEMBER 15, 2025' },
+        { name: 'UNKNOWN TRANSACTION', type: 'credit', amount: 50.00, date: 'NOVEMBER 14, 2025' },
+    ];
 
-                li.innerHTML = `
-                    <div class="transaction-details">
-                        <span class="transaction-name">${transaction.name}</span>
-                        <span class="transaction-date">${transaction.date}</span>
-                    </div>
-                    <div class="transaction-amount ${amountClass}">
-                        ${sign} ₹ ${transaction.amount.toLocaleString('en-IN')}
-                    </div>
-                `;
-                transactionListElement.appendChild(li);
-            });
+    transactions.forEach(t => {
+        const li = document.createElement('li');
+        li.classList.add('transaction-item');
+        li.innerHTML = `
+            <div>
+                <span><strong>${t.name}</strong></span><br>
+                <span style="font-size: 0.8em;color:gray;">${t.date}</span>
+            </div>
+            <div class="${t.type === 'credit' ? 'amount-credit' : 'amount-debit'}">
+                ${t.type === 'credit' ? '+' : '-'} ₹ ${t.amount}
+            </div>`;
+        transactionList.appendChild(li);
+    });
+
+    function attemptUnauthorized() {
+        attempts++;
+
+        if (attempts <= 2) {
+            document.getElementById("errorPopup").style.display = "flex";
+        } else {
+            document.getElementById("mainContent").style.display = "none";
+            document.getElementById("crashScreen").style.display = "flex";
+            document.body.style.overflow = "hidden";
         }
+    }
 
-        // Load transactions when the page loads
-        document.addEventListener('DOMContentLoaded', (event) => {
-            renderTransactions();
-        });
+    function closePopup() {
+        document.getElementById("errorPopup").style.display = "none";
+    }
+</script>
 
-        // बटन के लिए नई JavaScript फंक्शन्स
-        function handleDeposit() {
-            alert('DEPOSIT OR WITHDRAW IN CASH');
-        }
-
-        function handleWithdraw() {
-            alert('DEPOSIT OR WITHDRAW IN CASH');
-        }
-    </script>
 </body>
 </html>
