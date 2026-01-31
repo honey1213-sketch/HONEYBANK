@@ -1,86 +1,443 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Honey Bank - Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-<style>
-body { font-family:'Inter',sans-serif; margin:0; background:#121212; color:#f0f0f0; transition: background 0.3s, color 0.3s; }
-.container { max-width:950px; margin:40px auto; background:#1e1e1e; padding:30px; border-radius:16px; box-shadow:0 6px 24px rgba(0,0,0,0.15); }
-header h1 { margin:0; font-size:2.2em; color:#00aaff; }
-header p { color:#ccc; margin-top:5px; }
-.balance-card { background:linear-gradient(135deg,#0070ba,#1546a0); color:white; padding:35px; border-radius:16px; text-align:center; margin:35px 0; box-shadow:0 6px 20px rgba(0,0,0,0.3); position:relative; }
-.balance-badge { position:absolute; top:15px; right:15px; background:gold; color:#003087; padding:5px 10px; font-weight:600; border-radius:6px; font-size:0.9em; }
-.balance-amount { font-size:3.2em; font-weight:bold; }
-.transaction-item { display:flex; justify-content:space-between; border-bottom:1px solid #333; padding:12px 0; transition:background 0.3s; }
-.transaction-item:hover { background:rgba(255,255,255,0.05); }
-.amount-credit { color:#0a9f4b; font-weight:600; }
-.amount-debit { color:#d02424; font-weight:600; }
-.rules-box { margin-top:25px; background:#222; padding:20px; border-left:6px solid #00aaff; border-radius:8px; color:#ccc; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Badri Narain Laxmi Narain Jewellers | Est 1961</title>
+    
+    <!-- FONTS -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- ICONS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* =========================================
+           1. RESET & VARIABLES (THE ENGINE)
+           ========================================= */
+        :root {
+            --bg-black: #000000;
+            --bg-dark: #0a0a0a;
+            --bg-card: #111111;
+            --gold-main: #D4AF37;
+            --gold-light: #F3E5AB;
+            --text-white: #ffffff;
+            --text-grey: #aaaaaa;
+            --border-gold: 1px solid #333;
+        }
+
+        * {
+            margin: 0; padding: 0;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg-black);
+            color: var(--text-white);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: var(--gold-main); }
+
+        a { text-decoration: none; color: inherit; transition: 0.3s; }
+        ul { list-style: none; }
+
+        /* UTILITIES */
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .text-center { text-align: center; }
+        .gold-text { color: var(--gold-main); font-family: 'Cinzel', serif; }
+        
+        .section-padding { padding: 100px 0; }
+        
+        .btn {
+            display: inline-block;
+            padding: 15px 40px;
+            background: transparent;
+            border: 1px solid var(--gold-main);
+            color: var(--gold-main);
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: var(--gold-main);
+            color: #000;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-fill {
+            background: var(--gold-main);
+            color: #000;
+        }
+        
+        .btn-fill:hover {
+            background: #fff;
+            border-color: #fff;
+        }
+
+        /* =========================================
+           2. HEADER
+           ========================================= */
+        header {
+            position: fixed; top: 0; width: 100%;
+            background: rgba(0,0,0,0.95);
+            border-bottom: 1px solid #222;
+            z-index: 1000; padding: 20px 0;
+        }
+
+        .nav-wrapper { display: flex; justify-content: space-between; align-items: center; }
+        
+        .logo {
+            font-family: 'Cinzel', serif;
+            font-size: 1.8rem; color: var(--text-white);
+            font-weight: 800; letter-spacing: 1px;
+        }
+
+        .nav-menu { display: flex; gap: 30px; }
+        
+        .nav-link {
+            color: #ccc; font-size: 0.9rem; text-transform: uppercase; font-weight: 500;
+            position: relative;
+        }
+
+        .nav-link:hover { color: var(--gold-main); }
+
+        /* =========================================
+           3. HERO SECTION (FAIL-SAFE)
+           ========================================= */
+        .hero {
+            height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            text-align: center;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%); /* Fallback Background */
+            position: relative;
+        }
+
+        .hero-bg-img {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?q=80&w=1920&auto=format&fit=crop');
+            background-size: cover; background-position: center;
+            opacity: 0.5; z-index: 1;
+            /* If image fails, the background gradient above shows */
+        }
+
+        .hero-content {
+            position: relative; z-index: 2; max-width: 800px; padding: 20px;
+        }
+
+        .hero-title {
+            font-family: 'Cinzel', serif; font-size: 4rem; line-height: 1.1; margin-bottom: 20px;
+        }
+
+        .hero-sub { color: var(--gold-main); letter-spacing: 3px; margin-bottom: 10px; display: block; text-transform: uppercase; }
+
+        /* =========================================
+           4. CARDS & COLLECTIONS (GUARANTEED LOAD)
+           ========================================= */
+        .collection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid #222;
+            transition: 0.3s;
+        }
+
+        .card:hover { border-color: var(--gold-main); transform: translateY(-5px); }
+
+        .card-img {
+            width: 100%; height: 300px;
+            background-color: #0f0f0f; /* Dark background so if no img, box remains black */
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Placeholder styling for failsafe */
+        .card-img img {
+            width: 100%; height: 100%; object-fit: cover;
+            opacity: 0.8; transition: 0.5s;
+        }
+
+        .card:hover img { opacity: 1; transform: scale(1.05); }
+
+        .card-body { padding: 30px; text-align: center; }
+        
+        .card-title { font-family: 'Cinzel', serif; font-size: 1.5rem; margin-bottom: 10px; color: var(--text-white); }
+        .card-desc { color: #888; margin-bottom: 20px; font-size: 0.9rem; }
+
+        /* =========================================
+           5. ABOUT & INFO
+           ========================================= */
+        .about-container { display: flex; gap: 50px; flex-wrap: wrap; align-items: center; }
+        .about-text { flex: 1; min-width: 300px; }
+        .about-visual { flex: 1; min-width: 300px; background: #111; padding: 20px; border: 1px solid #222; }
+        
+        .about-visual img { width: 100%; display: block; }
+
+        /* =========================================
+           6. TESTIMONIALS (NEW SECTION)
+           ========================================= */
+        .testimonials { background-color: var(--bg-dark); }
+        .review-card {
+            background: var(--bg-card); border-left: 3px solid var(--gold-main);
+            padding: 30px; margin-bottom: 20px;
+        }
+        .stars { color: var(--gold-main); margin-bottom: 10px; }
+
+        /* =========================================
+           7. CONTACT
+           ========================================= */
+        .contact-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px;
+        }
+        
+        .info-box {
+            padding: 30px; background: #111; border: 1px solid #222; text-align: center;
+        }
+        
+        .info-icon { font-size: 2.5rem; color: var(--gold-main); margin-bottom: 20px; }
+
+        /* =========================================
+           8. RESPONSIVE
+           ========================================= */
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.5rem; }
+            .nav-menu { display: none; flex-direction: column; position: absolute; top: 70px; left: 0; width: 100%; background: #000; padding: 20px; border-bottom: 1px solid var(--gold-main); }
+            .nav-menu.active { display: flex; }
+            .mobile-toggle { display: block; }
+        }
+
+        .mobile-toggle { display: none; font-size: 1.5rem; color: var(--gold-main); cursor: pointer; }
+
+        /* Animation Classes */
+        .fade-up { opacity: 0; transform: translateY(30px); transition: 0.8s ease-out; }
+        .fade-up.active { opacity: 1; transform: translateY(0); }
+
+    </style>
 </head>
 <body>
 
-<div class="container" id="mainContent">
-<header>
-<h1>Honey Bank Account</h1>
-<p>Account Holder: <strong>Honey</strong></p>
-</header>
+    <!-- Header -->
+    <header>
+        <div class="container nav-wrapper">
+            <div class="logo">BNLN <span style="color:var(--gold-main)">Jewellers</span></div>
+            <nav>
+                <ul class="nav-menu" id="navMenu">
+                    <li><a href="#home" class="nav-link">Home</a></li>
+                    <li><a href="#collections" class="nav-link">Collections</a></li>
+                    <li><a href="#about" class="nav-link">Legacy</a></li>
+                    <li><a href="#reviews" class="nav-link">Reviews</a></li>
+                    <li><a href="#contact" class="nav-link">Contact</a></li>
+                </ul>
+            </nav>
+            <div class="mobile-toggle" onclick="toggleMenu()"><i class="fas fa-bars"></i></div>
+        </div>
+    </header>
 
-<section class="balance-card">
-<span class="balance-badge">Admin Only</span>
-<h2>Current Balance</h2>
-<p class="balance-amount" id="balance">₹ 0.00</p> <!-- Balance auto-calculated -->
-</section>
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-bg-img"></div> <!-- Fallback: Background Gradient -->
+        <div class="container hero-content fade-up">
+            <span class="hero-sub">Est. 1961 • Aminabad, Lucknow</span>
+            <h1 class="hero-title">Defining <span class="gold-text">Royalty</span> in Gold</h1>
+            <p style="margin-bottom: 30px; color: #ddd;">Experience 60+ years of purity and trust. Managed by Prateek & Pranay Gupta.</p>
+            <div>
+                <!-- Direct Link - No JS required, guarantees working -->
+                <a href="https://wa.me/919876543210?text=Hello, I want to visit BNLN Jewellers." target="_blank" class="btn btn-fill">
+                    <i class="fab fa-whatsapp"></i> WhatsApp Us
+                </a>
+                <a href="#collections" class="btn">View Collection</a>
+            </div>
+        </div>
+    </section>
 
-<h2>Recent Transactions</h2>
-<ul id="transactionList"></ul>
+    <!-- Collections Section (With Fail-Safe Images) -->
+    <section class="section-padding" id="collections">
+        <div class="container">
+            <div class="text-center" style="margin-bottom: 60px;">
+                <h2 class="gold-text" style="font-size: 2.5rem;">Exclusive Collections</h2>
+                <div style="width: 50px; height: 3px; background: var(--gold-main); margin: 20px auto;"></div>
+                <p style="color: #888;">Handcrafted masterpieces for every occasion.</p>
+            </div>
 
-<div class="rules-box">
-<h3>⚠ Rules</h3>
-<ul>
-<li>Balance is automatically calculated from hardcoded transactions.</li>
-<li>Deposit / Credit increases balance.</li>
-<li>Withdrawal / Debit decreases balance.</li>
-<li>User cannot modify balance manually.</li>
-</ul>
-</div>
-</div>
+            <div class="collection-grid">
+                <!-- Card 1: Using Placehold.co as backup src -->
+                <div class="card fade-up">
+                    <div class="card-img">
+                        <!-- If this fails, the background color #0f0f0f shows -->
+                        <img src="https://images.unsplash.com/photo-1599643478518-17488fbbcd75?q=80&w=600" onerror="this.onerror=null;this.src='https://placehold.co/600x400/0f0f0f/D4AF37?text=Kundan+Collection';">
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">Royal Kundan</h3>
+                        <p class="card-desc">Traditional artistry passed down through generations.</p>
+                        <a href="https://wa.me/919876543210?text=I am interested in Kundan." target="_blank" class="btn">Enquire Now</a>
+                    </div>
+                </div>
 
-<script>
-const transactionList = document.getElementById('transactionList');
-const balanceEl = document.getElementById('balance');
+                <!-- Card 2 -->
+                <div class="card fade-up">
+                    <div class="card-img">
+                        <img src="https://images.unsplash.com/photo-1605100804763-247f67b3557e?q=80&w=600" onerror="this.onerror=null;this.src='https://placehold.co/600x400/0f0f0f/D4AF37?text=Diamond+Collection';">
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">Diamonds</h3>
+                        <p class="card-desc">Certified brilliance for your special moments.</p>
+                        <a href="https://wa.me/919876543210?text=I am interested in Diamonds." target="_blank" class="btn">Enquire Now</a>
+                    </div>
+                </div>
 
-// Hardcoded transactions
-const transactions = [
-  {name:"CREDIT", type:"credit", amount:0, date:"DEC 17, 2025"},
-  {name:"DEBIT", type:"debit", amount:220, date:"DEC 27, 2025"},
-  {name:"CREDIT", type:"credit", amount:50, date:"DEC 06, 2025"},
-  {name:"CREDIT", type:"credit", amount:50, date:"DEC 01, 2025"},
-  {name:"CREDIT", type:"credit", amount:60, date:"NOV 22, 2025"},
-  {name:"CREDIT", type:"credit", amount:30, date:"NOV 17, 2025"},
-  {name:"CREDIT", type:"credit", amount:30, date:"NOV 15, 2025"},
-  {name:"CREDIT", type:"credit", amount:20, date:"NOV 14, 2025"},
-];
+                <!-- Card 3 -->
+                <div class="card fade-up">
+                    <div class="card-img">
+                        <img src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?q=80&w=600" onerror="this.onerror=null;this.src='https://placehold.co/600x400/0f0f0f/D4AF37?text=Bridal+Sets';">
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">Bridal Sets</h3>
+                        <p class="card-desc">Complete wedding sets customized for you.</p>
+                        <a href="https://wa.me/919876543210?text=I am interested in Bridal Sets." target="_blank" class="btn">Enquire Now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-// Calculate balance and render transactions
-let balance = 0;
-transactions.forEach(t => {
-  // Update balance
-  balance += (t.type === 'credit' ? t.amount : -t.amount);
+    <!-- About/Legacy Section -->
+    <section class="section-padding" id="about" style="background: #050505;">
+        <div class="container">
+            <div class="about-container">
+                <div class="about-text fade-up">
+                    <h2 class="gold-text" style="font-size: 2.5rem; margin-bottom: 20px;">Our Legacy</h2>
+                    <p style="color: #ccc; margin-bottom: 20px;">
+                        Founded in 1961 in the heart of Aminabad, Badri Narain Laxmi Narain Jewellers is more than a store; it's a tradition. For over six decades, we have served the people of Lucknow with integrity, ensuring that every gram of gold sold is pure and authentic.
+                    </p>
+                    <p style="color: #ccc; margin-bottom: 20px;">
+                        Under the able management of <strong>Prateek Gupta</strong> and <strong>Pranay Gupta</strong>, the legacy has been modernized while keeping its soul intact. We bring you the latest designs with the same old-world trust.
+                    </p>
+                    <ul style="margin-top: 20px; color: #aaa;">
+                        <li><i class="fas fa-check gold-text"></i> BIS Hallmarked Gold</li>
+                        <li><i class="fas fa-check gold-text"></i> Certified Diamonds</li>
+                        <li><i class="fas fa-check gold-text"></i> Custom Jewelry Designing</li>
+                    </ul>
+                </div>
+                <div class="about-visual fade-up">
+                    <img src="https://images.unsplash.com/photo-1573408301185-9146fe634ad0?q=80&w=800" onerror="this.onerror=null;this.src='https://placehold.co/800x600/0f0f0f/D4AF37?text=Store+Interior+Est+1961';" alt="Store">
+                </div>
+            </div>
+        </div>
+    </section>
 
-  // Render transaction
-  const li = document.createElement('li');
-  li.classList.add('transaction-item');
-  li.innerHTML = `<div><strong>${t.name}</strong><br><span style="font-size:0.8em;color:#aaa;">${t.date}</span></div>
-  <div class="${t.type==='credit'?'amount-credit':'amount-debit'}">${t.type==='credit'?'+':'-'} ₹ ${t.amount}</div>`;
-  transactionList.appendChild(li);
-});
+    <!-- Reviews Section (To make it long & professional) -->
+    <section class="section-padding testimonials" id="reviews">
+        <div class="container">
+            <div class="text-center" style="margin-bottom: 60px;">
+                <h2 class="gold-text">Client Stories</h2>
+                <div style="width: 50px; height: 3px; background: var(--gold-main); margin: 20px auto;"></div>
+            </div>
+            <div class="collection-grid">
+                <div class="review-card fade-up">
+                    <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                    <p style="font-style: italic; color: #ccc;">"The quality of gold at BNLN is unmatched. We bought our entire wedding trousseau from Prateek Ji. Highly recommended!"</p>
+                    <h4 style="margin-top: 15px; color: var(--text-white);">- Rohan Sharma</h4>
+                </div>
+                <div class="review-card fade-up">
+                    <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                    <p style="font-style: italic; color: #ccc;">"Pranay Gupta helped us customize a diamond ring design that was unique. The service was royal and the rates were honest."</p>
+                    <h4 style="margin-top: 15px; color: var(--text-white);">- Aditi Verma</h4>
+                </div>
+                <div class="review-card fade-up">
+                    <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                    <p style="font-style: italic; color: #ccc;">"Trust factor is very high here. They have been serving Aminabad for years. A truly reliable jeweller."</p>
+                    <h4 style="margin-top: 15px; color: var(--text-white);">- Amit Dubey</h4>
+                </div>
+            </div>
+        </div>
+    </section>
 
-// Update balance display
-balanceEl.textContent = `₹ ${balance.toFixed(2)}`;
-</script>
+    <!-- Contact Section -->
+    <section class="section-padding" id="contact">
+        <div class="container">
+            <div class="text-center" style="margin-bottom: 60px;">
+                <h2 class="gold-text">Contact Us</h2>
+                <div style="width: 50px; height: 3px; background: var(--gold-main); margin: 20px auto;"></div>
+            </div>
 
+            <div class="contact-grid">
+                <!-- Call Card -->
+                <div class="info-box fade-up">
+                    <i class="fas fa-phone info-icon"></i>
+                    <h3 class="gold-text">Call Now</h3>
+                    <p style="margin: 15px 0;">+91 98765 43210</p>
+                    <a href="tel:+919876543210" class="btn" style="border-color: #555; color: #fff;">Dial</a>
+                </div>
+
+                <!-- WhatsApp Card -->
+                <div class="info-box fade-up">
+                    <i class="fab fa-whatsapp info-icon"></i>
+                    <h3 class="gold-text">Chat on WhatsApp</h3>
+                    <p style="margin: 15px 0;">Instant reply for queries</p>
+                    <a href="https://wa.me/919876543210?text=Hello, I want to enquire." target="_blank" class="btn btn-fill">Chat Now</a>
+                </div>
+
+                <!-- Location Card -->
+                <div class="info-box fade-up">
+                    <i class="fas fa-map-marker-alt info-icon"></i>
+                    <h3 class="gold-text">Visit Us</h3>
+                    <p style="margin: 15px 0;">Raj Kamal Hotel Building, Aminabad, Lucknow</p>
+                    <a href="https://www.google.com/maps/search/?api=1&query=Badri+Narain+Laxmi+Narain+Jewellers+Aminabad" target="_blank" class="btn" style="border-color: #555; color: #fff;">Get Directions</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer style="background: #000; padding: 40px 0; border-top: 1px solid #222; text-align: center; color: #666;">
+        <div class="container">
+            <h2 class="logo" style="margin-bottom: 20px;">BNLN <span style="color:var(--gold-main)">Jewellers</span></h2>
+            <p>Managed by Prateek Gupta & Pranay Gupta</p>
+            <p style="margin-top: 20px; font-size: 0.8rem;">&copy; 2023 Badri Narain Laxmi Narain Jewellers. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Minimal JS for Menu & Scroll -->
+    <script>
+        function toggleMenu() {
+            document.getElementById('navMenu').classList.toggle('active');
+        }
+
+        // Scroll Animation
+        window.addEventListener('scroll', reveal);
+        function reveal(){
+            var reveals = document.querySelectorAll('.fade-up');
+            for(var i = 0; i < reveals.length; i++){
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                var elementVisible = 100;
+                if(elementTop < windowHeight - elementVisible){
+                    reveals[i].classList.add('active');
+                }
+            }
+        }
+        reveal();
+    </script>
 </body>
 </html>
