@@ -3,441 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Badri Narain Laxmi Narain Jewellers | Est 1961</title>
-    
-    <!-- FONTS -->
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
-    
-    <!-- ICONS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>InstaGrowth Pro - Auto Track</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
-        /* =========================================
-           1. RESET & VARIABLES (THE ENGINE)
-           ========================================= */
-        :root {
-            --bg-black: #000000;
-            --bg-dark: #0a0a0a;
-            --bg-card: #111111;
-            --gold-main: #D4AF37;
-            --gold-light: #F3E5AB;
-            --text-white: #ffffff;
-            --text-grey: #aaaaaa;
-            --border-gold: 1px solid #333;
-        }
-
-        * {
-            margin: 0; padding: 0;
-            box-sizing: border-box;
-            outline: none;
-        }
-
-        html { scroll-behavior: smooth; }
-
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: var(--bg-black);
-            color: var(--text-white);
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        /* SCROLLBAR */
-        ::-webkit-scrollbar { width: 10px; }
-        ::-webkit-scrollbar-track { background: #000; }
-        ::-webkit-scrollbar-thumb { background: var(--gold-main); }
-
-        a { text-decoration: none; color: inherit; transition: 0.3s; }
-        ul { list-style: none; }
-
-        /* UTILITIES */
-        .container {
-            max-width: 1300px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        .text-center { text-align: center; }
-        .gold-text { color: var(--gold-main); font-family: 'Cinzel', serif; }
+        :root { --primary: #E1306C; --gradient: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background: #fafafa; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 15px; }
         
-        .section-padding { padding: 100px 0; }
+        .app-card { width: 100%; max-width: 400px; background: white; border-radius: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); overflow: hidden; border: 4px solid #fff; }
+        header { background: var(--gradient); padding: 30px; text-align: center; color: white; }
+        .content { padding: 25px; display: none; }
+        .content.active { display: block; animation: slideUp 0.4s ease; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        input { width: 100%; padding: 15px; border: 2px solid #eee; border-radius: 12px; margin-bottom: 20px; outline: none; }
+        .plan { border: 2px solid #eee; padding: 12px; border-radius: 12px; margin-bottom: 8px; cursor: pointer; display: flex; justify-content: space-between; }
+        .plan.selected { border-color: var(--primary); background: #fff5f7; }
+
+        /* QR SCANNER UI */
+        .qr-area { text-align: center; position: relative; width: 220px; margin: 0 auto; }
+        .qr-area img { width: 100%; border-radius: 10px; padding: 10px; border: 1px solid #eee; }
+        .scan-line { position: absolute; width: 90%; left: 5%; height: 3px; background: var(--primary); box-shadow: 0 0 15px var(--primary); animation: moveLine 2.5s infinite linear; }
+        @keyframes moveLine { 0% { top: 10px; } 100% { top: 210px; } }
+
+        .status-msg { margin-top: 20px; background: #f8f9fa; padding: 15px; border-radius: 15px; text-align: center; font-weight: 600; color: #E1306C; }
         
-        .btn {
-            display: inline-block;
-            padding: 15px 40px;
-            background: transparent;
-            border: 1px solid var(--gold-main);
-            color: var(--gold-main);
-            font-family: 'Cinzel', serif;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn:hover {
-            background: var(--gold-main);
-            color: #000;
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
-        }
-
-        .btn-fill {
-            background: var(--gold-main);
-            color: #000;
-        }
-        
-        .btn-fill:hover {
-            background: #fff;
-            border-color: #fff;
-        }
-
-        /* =========================================
-           2. HEADER
-           ========================================= */
-        header {
-            position: fixed; top: 0; width: 100%;
-            background: rgba(0,0,0,0.95);
-            border-bottom: 1px solid #222;
-            z-index: 1000; padding: 20px 0;
-        }
-
-        .nav-wrapper { display: flex; justify-content: space-between; align-items: center; }
-        
-        .logo {
-            font-family: 'Cinzel', serif;
-            font-size: 1.8rem; color: var(--text-white);
-            font-weight: 800; letter-spacing: 1px;
-        }
-
-        .nav-menu { display: flex; gap: 30px; }
-        
-        .nav-link {
-            color: #ccc; font-size: 0.9rem; text-transform: uppercase; font-weight: 500;
-            position: relative;
-        }
-
-        .nav-link:hover { color: var(--gold-main); }
-
-        /* =========================================
-           3. HERO SECTION (FAIL-SAFE)
-           ========================================= */
-        .hero {
-            height: 100vh;
-            display: flex; align-items: center; justify-content: center;
-            text-align: center;
-            background: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%); /* Fallback Background */
-            position: relative;
-        }
-
-        .hero-bg-img {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background-image: url('https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?q=80&w=1920&auto=format&fit=crop');
-            background-size: cover; background-position: center;
-            opacity: 0.5; z-index: 1;
-            /* If image fails, the background gradient above shows */
-        }
-
-        .hero-content {
-            position: relative; z-index: 2; max-width: 800px; padding: 20px;
-        }
-
-        .hero-title {
-            font-family: 'Cinzel', serif; font-size: 4rem; line-height: 1.1; margin-bottom: 20px;
-        }
-
-        .hero-sub { color: var(--gold-main); letter-spacing: 3px; margin-bottom: 10px; display: block; text-transform: uppercase; }
-
-        /* =========================================
-           4. CARDS & COLLECTIONS (GUARANTEED LOAD)
-           ========================================= */
-        .collection-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 40px;
-        }
-
-        .card {
-            background: var(--bg-card);
-            border: 1px solid #222;
-            transition: 0.3s;
-        }
-
-        .card:hover { border-color: var(--gold-main); transform: translateY(-5px); }
-
-        .card-img {
-            width: 100%; height: 300px;
-            background-color: #0f0f0f; /* Dark background so if no img, box remains black */
-            display: flex; align-items: center; justify-content: center;
-            overflow: hidden;
-        }
-
-        /* Placeholder styling for failsafe */
-        .card-img img {
-            width: 100%; height: 100%; object-fit: cover;
-            opacity: 0.8; transition: 0.5s;
-        }
-
-        .card:hover img { opacity: 1; transform: scale(1.05); }
-
-        .card-body { padding: 30px; text-align: center; }
-        
-        .card-title { font-family: 'Cinzel', serif; font-size: 1.5rem; margin-bottom: 10px; color: var(--text-white); }
-        .card-desc { color: #888; margin-bottom: 20px; font-size: 0.9rem; }
-
-        /* =========================================
-           5. ABOUT & INFO
-           ========================================= */
-        .about-container { display: flex; gap: 50px; flex-wrap: wrap; align-items: center; }
-        .about-text { flex: 1; min-width: 300px; }
-        .about-visual { flex: 1; min-width: 300px; background: #111; padding: 20px; border: 1px solid #222; }
-        
-        .about-visual img { width: 100%; display: block; }
-
-        /* =========================================
-           6. TESTIMONIALS (NEW SECTION)
-           ========================================= */
-        .testimonials { background-color: var(--bg-dark); }
-        .review-card {
-            background: var(--bg-card); border-left: 3px solid var(--gold-main);
-            padding: 30px; margin-bottom: 20px;
-        }
-        .stars { color: var(--gold-main); margin-bottom: 10px; }
-
-        /* =========================================
-           7. CONTACT
-           ========================================= */
-        .contact-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px;
-        }
-        
-        .info-box {
-            padding: 30px; background: #111; border: 1px solid #222; text-align: center;
-        }
-        
-        .info-icon { font-size: 2.5rem; color: var(--gold-main); margin-bottom: 20px; }
-
-        /* =========================================
-           8. RESPONSIVE
-           ========================================= */
-        @media (max-width: 768px) {
-            .hero-title { font-size: 2.5rem; }
-            .nav-menu { display: none; flex-direction: column; position: absolute; top: 70px; left: 0; width: 100%; background: #000; padding: 20px; border-bottom: 1px solid var(--gold-main); }
-            .nav-menu.active { display: flex; }
-            .mobile-toggle { display: block; }
-        }
-
-        .mobile-toggle { display: none; font-size: 1.5rem; color: var(--gold-main); cursor: pointer; }
-
-        /* Animation Classes */
-        .fade-up { opacity: 0; transform: translateY(30px); transition: 0.8s ease-out; }
-        .fade-up.active { opacity: 1; transform: translateY(0); }
-
+        .receipt { padding: 20px; border: 2px dashed #ddd; border-radius: 15px; background: #fff; }
+        .btn { width: 100%; padding: 16px; border: none; border-radius: 12px; background: var(--gradient); color: white; font-weight: 700; cursor: pointer; margin-top: 15px; }
     </style>
 </head>
 <body>
 
-    <!-- Header -->
-    <header>
-        <div class="container nav-wrapper">
-            <div class="logo">BNLN <span style="color:var(--gold-main)">Jewellers</span></div>
-            <nav>
-                <ul class="nav-menu" id="navMenu">
-                    <li><a href="#home" class="nav-link">Home</a></li>
-                    <li><a href="#collections" class="nav-link">Collections</a></li>
-                    <li><a href="#about" class="nav-link">Legacy</a></li>
-                    <li><a href="#reviews" class="nav-link">Reviews</a></li>
-                    <li><a href="#contact" class="nav-link">Contact</a></li>
-                </ul>
-            </nav>
-            <div class="mobile-toggle" onclick="toggleMenu()"><i class="fas fa-bars"></i></div>
+    <div id="main-app" class="app-card">
+        <header>
+            <h2>InstaGrowth Pro</h2>
+            <p>Automatic Order Tracker</p>
+        </header>
+
+        <div id="step-1" class="content active">
+            <input type="text" id="uname" placeholder="Instagram Username">
+            <div class="plan" onclick="sel('1000 Followers', '₹70', this)"><span>1000 Followers</span> <b>₹70</b></div>
+            <div class="plan" onclick="sel('2000 Followers', '₹140', this)"><span>2000 Followers</span> <b>₹140</b></div>
+            <button class="btn" onclick="generateQR()">Get QR Code</button>
         </div>
-    </header>
 
-    <!-- Hero Section -->
-    <section class="hero" id="home">
-        <div class="hero-bg-img"></div> <!-- Fallback: Background Gradient -->
-        <div class="container hero-content fade-up">
-            <span class="hero-sub">Est. 1961 • Aminabad, Lucknow</span>
-            <h1 class="hero-title">Defining <span class="gold-text">Royalty</span> in Gold</h1>
-            <p style="margin-bottom: 30px; color: #ddd;">Experience 60+ years of purity and trust. Managed by Prateek & Pranay Gupta.</p>
-            <div>
-                <!-- Direct Link - No JS required, guarantees working -->
-                <a href="https://wa.me/919876543210?text=Hello, I want to visit BNLN Jewellers." target="_blank" class="btn btn-fill">
-                    <i class="fab fa-whatsapp"></i> WhatsApp Us
-                </a>
-                <a href="#collections" class="btn">View Collection</a>
+        <div id="step-2" class="content">
+            <div class="qr-area">
+                <div class="scan-line"></div>
+                <img id="track-qr" src="" alt="Scan Me">
             </div>
+            <div class="status-msg" id="status-text">
+                WAITING FOR SCAN...
+            </div>
+            <p style="text-align: center; font-size: 0.8rem; color: #888; margin-top: 10px;">
+                Scan with GPay, Paytm or Camera.<br>Receipt will generate automatically.
+            </p>
         </div>
-    </section>
 
-    <!-- Collections Section (With Fail-Safe Images) -->
-    <section class="section-padding" id="collections">
-        <div class="container">
-            <div class="text-center" style="margin-bottom: 60px;">
-                <h2 class="gold-text" style="font-size: 2.5rem;">Exclusive Collections</h2>
-                <div style="width: 50px; height: 3px; background: var(--gold-main); margin: 20px auto;"></div>
-                <p style="color: #888;">Handcrafted masterpieces for every occasion.</p>
+        <div id="step-3" class="content">
+            <div id="receipt-box" class="receipt">
+                <h4 style="text-align:center; color:#4BB543; margin-bottom:15px;">✓ SCAN VERIFIED</h4>
+                <p>User: <b id="res-u"></b></p>
+                <p>Plan: <b id="res-p"></b></p>
+                <p>Status: <b style="color:green">Order Started</b></p>
+                <p style="font-size: 0.7rem; color: #999; margin-top: 10px;" id="res-d"></p>
             </div>
-
-            <div class="collection-grid">
-                <!-- Card 1: Using Placehold.co as backup src -->
-                <div class="card fade-up">
-                    <div class="card-img">
-                        <!-- If this fails, the background color #0f0f0f shows -->
-                        <img src="https://images.unsplash.com/photo-1599643478518-17488fbbcd75?q=80&w=600" onerror="this.onerror=null;this.src='https://placehold.co/600x400/0f0f0f/D4AF37?text=Kundan+Collection';">
-                    </div>
-                    <div class="card-body">
-                        <h3 class="card-title">Royal Kundan</h3>
-                        <p class="card-desc">Traditional artistry passed down through generations.</p>
-                        <a href="https://wa.me/919876543210?text=I am interested in Kundan." target="_blank" class="btn">Enquire Now</a>
-                    </div>
-                </div>
-
-                <!-- Card 2 -->
-                <div class="card fade-up">
-                    <div class="card-img">
-                        <img src="https://images.unsplash.com/photo-1605100804763-247f67b3557e?q=80&w=600" onerror="this.onerror=null;this.src='https://placehold.co/600x400/0f0f0f/D4AF37?text=Diamond+Collection';">
-                    </div>
-                    <div class="card-body">
-                        <h3 class="card-title">Diamonds</h3>
-                        <p class="card-desc">Certified brilliance for your special moments.</p>
-                        <a href="https://wa.me/919876543210?text=I am interested in Diamonds." target="_blank" class="btn">Enquire Now</a>
-                    </div>
-                </div>
-
-                <!-- Card 3 -->
-                <div class="card fade-up">
-                    <div class="card-img">
-                        <img src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?q=80&w=600" onerror="this.onerror=null;this.src='https://placehold.co/600x400/0f0f0f/D4AF37?text=Bridal+Sets';">
-                    </div>
-                    <div class="card-body">
-                        <h3 class="card-title">Bridal Sets</h3>
-                        <p class="card-desc">Complete wedding sets customized for you.</p>
-                        <a href="https://wa.me/919876543210?text=I am interested in Bridal Sets." target="_blank" class="btn">Enquire Now</a>
-                    </div>
-                </div>
-            </div>
+            <button class="btn" onclick="download()">Download Receipt</button>
         </div>
-    </section>
+    </div>
 
-    <!-- About/Legacy Section -->
-    <section class="section-padding" id="about" style="background: #050505;">
-        <div class="container">
-            <div class="about-container">
-                <div class="about-text fade-up">
-                    <h2 class="gold-text" style="font-size: 2.5rem; margin-bottom: 20px;">Our Legacy</h2>
-                    <p style="color: #ccc; margin-bottom: 20px;">
-                        Founded in 1961 in the heart of Aminabad, Badri Narain Laxmi Narain Jewellers is more than a store; it's a tradition. For over six decades, we have served the people of Lucknow with integrity, ensuring that every gram of gold sold is pure and authentic.
-                    </p>
-                    <p style="color: #ccc; margin-bottom: 20px;">
-                        Under the able management of <strong>Prateek Gupta</strong> and <strong>Pranay Gupta</strong>, the legacy has been modernized while keeping its soul intact. We bring you the latest designs with the same old-world trust.
-                    </p>
-                    <ul style="margin-top: 20px; color: #aaa;">
-                        <li><i class="fas fa-check gold-text"></i> BIS Hallmarked Gold</li>
-                        <li><i class="fas fa-check gold-text"></i> Certified Diamonds</li>
-                        <li><i class="fas fa-check gold-text"></i> Custom Jewelry Designing</li>
-                    </ul>
-                </div>
-                <div class="about-visual fade-up">
-                    <img src="https://images.unsplash.com/photo-1573408301185-9146fe634ad0?q=80&w=800" onerror="this.onerror=null;this.src='https://placehold.co/800x600/0f0f0f/D4AF37?text=Store+Interior+Est+1961';" alt="Store">
-                </div>
-            </div>
-        </div>
-    </section>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, set, onValue, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-    <!-- Reviews Section (To make it long & professional) -->
-    <section class="section-padding testimonials" id="reviews">
-        <div class="container">
-            <div class="text-center" style="margin-bottom: 60px;">
-                <h2 class="gold-text">Client Stories</h2>
-                <div style="width: 50px; height: 3px; background: var(--gold-main); margin: 20px auto;"></div>
-            </div>
-            <div class="collection-grid">
-                <div class="review-card fade-up">
-                    <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                    <p style="font-style: italic; color: #ccc;">"The quality of gold at BNLN is unmatched. We bought our entire wedding trousseau from Prateek Ji. Highly recommended!"</p>
-                    <h4 style="margin-top: 15px; color: var(--text-white);">- Rohan Sharma</h4>
-                </div>
-                <div class="review-card fade-up">
-                    <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                    <p style="font-style: italic; color: #ccc;">"Pranay Gupta helped us customize a diamond ring design that was unique. The service was royal and the rates were honest."</p>
-                    <h4 style="margin-top: 15px; color: var(--text-white);">- Aditi Verma</h4>
-                </div>
-                <div class="review-card fade-up">
-                    <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                    <p style="font-style: italic; color: #ccc;">"Trust factor is very high here. They have been serving Aminabad for years. A truly reliable jeweller."</p>
-                    <h4 style="margin-top: 15px; color: var(--text-white);">- Amit Dubey</h4>
-                </div>
-            </div>
-        </div>
-    </section>
+        const firebaseConfig = {
+            apiKey: "AIzaSyADw-Q4KE7pykMMisKKdBoGGEH_DQ__WAw",
+            authDomain: "instagrowthpro-5bcc7.firebaseapp.com",
+            databaseURL: "https://instagrowthpro-5bcc7-default-rtdb.firebaseio.com",
+            projectId: "instagrowthpro-5bcc7",
+            storageBucket: "instagrowthpro-5bcc7.firebasestorage.app",
+            messagingSenderId: "626393618586",
+            appId: "1:626393618586:web:e66e17c3e803cacbb26723"
+        };
 
-    <!-- Contact Section -->
-    <section class="section-padding" id="contact">
-        <div class="container">
-            <div class="text-center" style="margin-bottom: 60px;">
-                <h2 class="gold-text">Contact Us</h2>
-                <div style="width: 50px; height: 3px; background: var(--gold-main); margin: 20px auto;"></div>
-            </div>
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
 
-            <div class="contact-grid">
-                <!-- Call Card -->
-                <div class="info-box fade-up">
-                    <i class="fas fa-phone info-icon"></i>
-                    <h3 class="gold-text">Call Now</h3>
-                    <p style="margin: 15px 0;">+91 98765 43210</p>
-                    <a href="tel:+919876543210" class="btn" style="border-color: #555; color: #fff;">Dial</a>
-                </div>
+        let orderData = { user: '', plan: '' };
 
-                <!-- WhatsApp Card -->
-                <div class="info-box fade-up">
-                    <i class="fab fa-whatsapp info-icon"></i>
-                    <h3 class="gold-text">Chat on WhatsApp</h3>
-                    <p style="margin: 15px 0;">Instant reply for queries</p>
-                    <a href="https://wa.me/919876543210?text=Hello, I want to enquire." target="_blank" class="btn btn-fill">Chat Now</a>
-                </div>
-
-                <!-- Location Card -->
-                <div class="info-box fade-up">
-                    <i class="fas fa-map-marker-alt info-icon"></i>
-                    <h3 class="gold-text">Visit Us</h3>
-                    <p style="margin: 15px 0;">Raj Kamal Hotel Building, Aminabad, Lucknow</p>
-                    <a href="https://www.google.com/maps/search/?api=1&query=Badri+Narain+Laxmi+Narain+Jewellers+Aminabad" target="_blank" class="btn" style="border-color: #555; color: #fff;">Get Directions</a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer style="background: #000; padding: 40px 0; border-top: 1px solid #222; text-align: center; color: #666;">
-        <div class="container">
-            <h2 class="logo" style="margin-bottom: 20px;">BNLN <span style="color:var(--gold-main)">Jewellers</span></h2>
-            <p>Managed by Prateek Gupta & Pranay Gupta</p>
-            <p style="margin-top: 20px; font-size: 0.8rem;">&copy; 2023 Badri Narain Laxmi Narain Jewellers. All rights reserved.</p>
-        </div>
-    </footer>
-
-    <!-- Minimal JS for Menu & Scroll -->
-    <script>
-        function toggleMenu() {
-            document.getElementById('navMenu').classList.toggle('active');
+        // 1. Plan Select Function
+        window.sel = (n, p, el) => {
+            orderData.plan = n;
+            document.querySelectorAll('.plan').forEach(b => b.classList.remove('selected'));
+            el.classList.add('selected');
         }
 
-        // Scroll Animation
-        window.addEventListener('scroll', reveal);
-        function reveal(){
-            var reveals = document.querySelectorAll('.fade-up');
-            for(var i = 0; i < reveals.length; i++){
-                var windowHeight = window.innerHeight;
-                var elementTop = reveals[i].getBoundingClientRect().top;
-                var elementVisible = 100;
-                if(elementTop < windowHeight - elementVisible){
-                    reveals[i].classList.add('active');
+        // 2. Generate QR and Listen for Scan
+        window.generateQR = async () => {
+            const user = document.getElementById('uname').value;
+            if(!user || !orderData.plan) return alert("Fill details!");
+            orderData.user = user;
+
+            const sessionID = "SCAN_" + Math.floor(Math.random() * 9999);
+            
+            // Database mein pending entry daalo
+            await set(ref(db, 'orders/' + sessionID), {
+                status: 'pending',
+                user: user
+            });
+
+            // QR Link: Isme hum usi page ka URL bhej rahe hain jisme "scan=true" ho
+            // IMPORTANT: 'your-website-url.com' ko apne asli URL se badle
+            const currentURL = window.location.href.split('?')[0];
+            const scanLink = `${currentURL}?id=${sessionID}&scan=true`;
+            
+            document.getElementById('track-qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(scanLink)}`;
+            
+            showStep(2);
+
+            // Live Database Listener
+            onValue(ref(db, 'orders/' + sessionID), (snapshot) => {
+                if (snapshot.val() && snapshot.val().status === 'done') {
+                    showReceipt(sessionID);
                 }
-            }
+            });
         }
-        reveal();
+
+        // 3. Scan Detection Logic (For the other phone)
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('scan') === 'true') {
+            const id = params.get('id');
+            update(ref(db, 'orders/' + id), { status: 'done' }).then(() => {
+                document.body.innerHTML = "<h2 style='text-align:center; margin-top:50px;'>Scan Verified! Check other phone.</h2>";
+            });
+        }
+
+        function showReceipt(id) {
+            document.getElementById('res-u').innerText = "@" + orderData.user;
+            document.getElementById('res-p').innerText = orderData.plan;
+            document.getElementById('res-d').innerText = new Date().toLocaleString();
+            showStep(3);
+        }
+
+        function showStep(n) {
+            document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+            document.getElementById('step-' + n).classList.add('active');
+        }
+
+        window.download = () => {
+            html2canvas(document.getElementById('receipt-box')).then(canvas => {
+                let a = document.createElement('a');
+                a.download = 'Receipt.png'; a.href = canvas.toDataURL(); a.click();
+            });
+        }
     </script>
 </body>
 </html>
