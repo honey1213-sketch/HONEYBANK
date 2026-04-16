@@ -3,74 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>InstaGrowth Pro - Auto Track</title>
+    <title>InstaGrowth Pro - Magic Tracker</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
         :root { --primary: #E1306C; --gradient: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        body { background: #fafafa; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 15px; }
+        body { background: #f4f4f4; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 10px; }
         
-        .app-card { width: 100%; max-width: 400px; background: white; border-radius: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); overflow: hidden; border: 4px solid #fff; }
+        .app-card { width: 100%; max-width: 400px; background: white; border-radius: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); overflow: hidden; }
         header { background: var(--gradient); padding: 30px; text-align: center; color: white; }
         .content { padding: 25px; display: none; }
-        .content.active { display: block; animation: slideUp 0.4s ease; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .content.active { display: block; animation: fadeInUp 0.4s ease; }
 
-        input { width: 100%; padding: 15px; border: 2px solid #eee; border-radius: 12px; margin-bottom: 20px; outline: none; }
-        .plan { border: 2px solid #eee; padding: 12px; border-radius: 12px; margin-bottom: 8px; cursor: pointer; display: flex; justify-content: space-between; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        input { width: 100%; padding: 15px; border: 2px solid #eee; border-radius: 12px; margin-bottom: 20px; outline: none; font-size: 1rem; }
+        .plan { border: 2px solid #eee; padding: 15px; border-radius: 12px; margin-bottom: 10px; cursor: pointer; display: flex; justify-content: space-between; font-weight: 500; }
         .plan.selected { border-color: var(--primary); background: #fff5f7; }
 
-        /* QR SCANNER UI */
-        .qr-area { text-align: center; position: relative; width: 220px; margin: 0 auto; }
-        .qr-area img { width: 100%; border-radius: 10px; padding: 10px; border: 1px solid #eee; }
-        .scan-line { position: absolute; width: 90%; left: 5%; height: 3px; background: var(--primary); box-shadow: 0 0 15px var(--primary); animation: moveLine 2.5s infinite linear; }
+        .qr-area { text-align: center; position: relative; width: 220px; margin: 0 auto; background: white; padding: 10px; border-radius: 15px; border: 1px solid #eee; }
+        .qr-area img { width: 100%; display: block; }
+        .scan-line { position: absolute; width: 90%; left: 5%; height: 3px; background: var(--primary); box-shadow: 0 0 15px var(--primary); animation: moveLine 2s infinite linear; }
         @keyframes moveLine { 0% { top: 10px; } 100% { top: 210px; } }
 
-        .status-msg { margin-top: 20px; background: #f8f9fa; padding: 15px; border-radius: 15px; text-align: center; font-weight: 600; color: #E1306C; }
-        
-        .receipt { padding: 20px; border: 2px dashed #ddd; border-radius: 15px; background: #fff; }
-        .btn { width: 100%; padding: 16px; border: none; border-radius: 12px; background: var(--gradient); color: white; font-weight: 700; cursor: pointer; margin-top: 15px; }
+        .status-box { margin-top: 20px; text-align: center; background: #f8f9fa; padding: 15px; border-radius: 15px; border: 1px solid #eee; }
+        .status-text { color: var(--primary); font-weight: 700; font-size: 0.9rem; letter-spacing: 1px; }
+
+        .receipt { padding: 25px; border: 2px dashed #ddd; border-radius: 20px; background: #fff; position: relative; }
+        .r-row { display: flex; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px solid #f9f9f9; padding-bottom: 5px; font-size: 0.9rem; }
+        .btn { width: 100%; padding: 18px; border: none; border-radius: 15px; background: var(--gradient); color: white; font-weight: 700; cursor: pointer; font-size: 1rem; margin-top: 15px; }
     </style>
 </head>
 <body>
 
-    <div id="main-app" class="app-card">
+    <div class="app-card">
         <header>
-            <h2>InstaGrowth Pro</h2>
-            <p>Automatic Order Tracker</p>
+            <h2>InstaGrowth</h2>
+            <p>Remote Auto-Detection</p>
         </header>
 
         <div id="step-1" class="content active">
             <input type="text" id="uname" placeholder="Instagram Username">
-            <div class="plan" onclick="sel('1000 Followers', '₹70', this)"><span>1000 Followers</span> <b>₹70</b></div>
-            <div class="plan" onclick="sel('2000 Followers', '₹140', this)"><span>2000 Followers</span> <b>₹140</b></div>
-            <button class="btn" onclick="generateQR()">Get QR Code</button>
+            <div class="plan" onclick="selPlan('1000 Followers', '₹70', this)"><span>1000 Followers</span> <b>₹70</b></div>
+            <div class="plan" onclick="selPlan('2000 Followers', '₹140', this)"><span>2000 Followers</span> <b>₹140</b></div>
+            <button class="btn" onclick="startTracking()">Generate QR</button>
         </div>
 
         <div id="step-2" class="content">
             <div class="qr-area">
                 <div class="scan-line"></div>
-                <img id="track-qr" src="" alt="Scan Me">
+                <img id="main-qr" src="" alt="QR Code">
             </div>
-            <div class="status-msg" id="status-text">
-                WAITING FOR SCAN...
+            <div class="status-box">
+                <div class="status-text" id="stat">WAITING FOR SCAN...</div>
             </div>
-            <p style="text-align: center; font-size: 0.8rem; color: #888; margin-top: 10px;">
-                Scan with GPay, Paytm or Camera.<br>Receipt will generate automatically.
+            <p style="text-align: center; color: #888; font-size: 0.75rem; margin-top: 15px;">
+                Scan with any app on another phone.<br>System will track it live!
             </p>
         </div>
 
         <div id="step-3" class="content">
             <div id="receipt-box" class="receipt">
-                <h4 style="text-align:center; color:#4BB543; margin-bottom:15px;">✓ SCAN VERIFIED</h4>
-                <p>User: <b id="res-u"></b></p>
-                <p>Plan: <b id="res-p"></b></p>
-                <p>Status: <b style="color:green">Order Started</b></p>
-                <p style="font-size: 0.7rem; color: #999; margin-top: 10px;" id="res-d"></p>
+                <div style="text-align:center; color:#4BB543; font-weight:900; margin-bottom:15px; font-size:1.2rem;">SUCCESS</div>
+                <div class="r-row"><span>Username:</span><b id="final-u"></b></div>
+                <div class="r-row"><span>Package:</span><b id="final-p"></b></div>
+                <div class="r-row"><span>Order ID:</span><b id="final-id"></b></div>
+                <div class="r-row"><span>Status:</span><b style="color:green">Active</b></div>
+                <p style="text-align:center; font-size:0.7rem; color:#999; margin-top:10px;" id="final-d"></p>
             </div>
-            <button class="btn" onclick="download()">Download Receipt</button>
+            <button class="btn" onclick="save()">Download Receipt</button>
+            <button class="btn" style="background:#eee; color:#333;" onclick="location.reload()">New Order</button>
         </div>
     </div>
 
@@ -91,59 +95,60 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        let orderData = { user: '', plan: '' };
+        let currentOrder = { plan: '', user: '' };
 
-        // 1. Plan Select Function
-        window.sel = (n, p, el) => {
-            orderData.plan = n;
-            document.querySelectorAll('.plan').forEach(b => b.classList.remove('selected'));
+        // Handle Plan Selection
+        window.selPlan = (p, a, el) => {
+            currentOrder.plan = p;
+            document.querySelectorAll('.plan').forEach(d => d.classList.remove('selected'));
             el.classList.add('selected');
         }
 
-        // 2. Generate QR and Listen for Scan
-        window.generateQR = async () => {
-            const user = document.getElementById('uname').value;
-            if(!user || !orderData.plan) return alert("Fill details!");
-            orderData.user = user;
+        // Generate QR and Track
+        window.startTracking = async () => {
+            const u = document.getElementById('uname').value;
+            if(!u || !currentOrder.plan) return alert("Please enter username and select plan!");
+            currentOrder.user = u;
 
-            const sessionID = "SCAN_" + Math.floor(Math.random() * 9999);
+            const sid = "ORD" + Math.floor(Math.random() * 8999 + 1000);
             
-            // Database mein pending entry daalo
-            await set(ref(db, 'orders/' + sessionID), {
-                status: 'pending',
-                user: user
+            // 1. Create entry in DB
+            await set(ref(db, 'magic_scans/' + sid), {
+                status: 'waiting',
+                user: u
             });
 
-            // QR Link: Isme hum usi page ka URL bhej rahe hain jisme "scan=true" ho
-            // IMPORTANT: 'your-website-url.com' ko apne asli URL se badle
-            const currentURL = window.location.href.split('?')[0];
-            const scanLink = `${currentURL}?id=${sessionID}&scan=true`;
+            // 2. Build QR Link (Auto-detect Current URL)
+            const cleanURL = window.location.href.split('?')[0];
+            const finalLink = `${cleanURL}?scanID=${sid}`;
             
-            document.getElementById('track-qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(scanLink)}`;
+            document.getElementById('main-qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(finalLink)}`;
             
             showStep(2);
 
-            // Live Database Listener
-            onValue(ref(db, 'orders/' + sessionID), (snapshot) => {
-                if (snapshot.val() && snapshot.val().status === 'done') {
-                    showReceipt(sessionID);
+            // 3. LISTEN FOR UPDATE
+            onValue(ref(db, 'magic_scans/' + sid), (snap) => {
+                if(snap.val() && snap.val().status === 'done') {
+                    showFinal(u, sid);
                 }
             });
         }
 
-        // 3. Scan Detection Logic (For the other phone)
-        const params = new URLSearchParams(window.location.search);
-        if (params.get('scan') === 'true') {
-            const id = params.get('id');
-            update(ref(db, 'orders/' + id), { status: 'done' }).then(() => {
-                document.body.innerHTML = "<h2 style='text-align:center; margin-top:50px;'>Scan Verified! Check other phone.</h2>";
+        // DETECT IF THIS IS THE SCANNED PHONE
+        const urlParams = new URLSearchParams(window.location.search);
+        if(urlParams.get('scanID')) {
+            const sid = urlParams.get('scanID');
+            update(ref(db, 'magic_scans/' + sid), { status: 'done' }).then(() => {
+                // Redirect user to GPay or Google so they don't see this page
+                window.location.replace("https://www.google.com");
             });
         }
 
-        function showReceipt(id) {
-            document.getElementById('res-u').innerText = "@" + orderData.user;
-            document.getElementById('res-p').innerText = orderData.plan;
-            document.getElementById('res-d').innerText = new Date().toLocaleString();
+        function showFinal(u, id) {
+            document.getElementById('final-u').innerText = "@" + u;
+            document.getElementById('final-p').innerText = currentOrder.plan;
+            document.getElementById('final-id').innerText = "#" + id;
+            document.getElementById('final-d').innerText = new Date().toLocaleString();
             showStep(3);
         }
 
@@ -152,10 +157,10 @@
             document.getElementById('step-' + n).classList.add('active');
         }
 
-        window.download = () => {
+        window.save = () => {
             html2canvas(document.getElementById('receipt-box')).then(canvas => {
                 let a = document.createElement('a');
-                a.download = 'Receipt.png'; a.href = canvas.toDataURL(); a.click();
+                a.download = 'InstaReceipt.png'; a.href = canvas.toDataURL(); a.click();
             });
         }
     </script>
