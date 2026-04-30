@@ -123,6 +123,34 @@
         opacity: 0;
         animation: fadeUp 0.5s ease forwards;
       }
+      /* Order placed success animation */
+      @keyframes successCircle {
+        from { stroke-dashoffset: 320; }
+        to   { stroke-dashoffset: 0; }
+      }
+      @keyframes successTick {
+        from { stroke-dashoffset: 80; }
+        to   { stroke-dashoffset: 0; }
+      }
+      @keyframes successPop {
+        0%   { transform: scale(0.5); opacity: 0; }
+        70%  { transform: scale(1.05); opacity: 1; }
+        100% { transform: scale(1); opacity: 1; }
+      }
+      @keyframes confettiFall {
+        0%   { transform: translateY(-30px) rotate(0deg); opacity: 1; }
+        100% { transform: translateY(120vh) rotate(720deg); opacity: 0; }
+      }
+      .success-overlay {
+        position: fixed; inset: 0; z-index: 100;
+        background: rgba(255,255,255,0.96);
+        display: grid; place-items: center;
+        animation: fadeUp 0.3s ease both;
+      }
+      .success-circle { stroke-dasharray: 320; animation: successCircle 0.7s cubic-bezier(0.65, 0, 0.45, 1) forwards; }
+      .success-tick   { stroke-dasharray: 80; stroke-dashoffset: 80; animation: successTick 0.4s 0.5s cubic-bezier(0.65, 0, 0.45, 1) forwards; }
+      .success-card   { animation: successPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+      .confetti       { position: absolute; width: 10px; height: 14px; border-radius: 2px; top: -20px; animation: confettiFall 2.4s linear forwards; }
       .stagger > *:nth-child(1) {
         animation-delay: 0.02s;
       }
@@ -709,6 +737,59 @@
         }
       }
 
+      // ---- Refunds & coupons ----
+      async function initiateRefund({ orderId, ticketId, userId, amount, type, agentName, reason }) {
+        const r = push(ref(rtdb, "refunds"));
+        const rrn = "RRN" + Date.now().toString().slice(-9) + Math.random().toString(36).slice(2, 5).toUpperCase();
+        const final = {
+          id: r.key, orderId, ticketId: ticketId || null, userId,
+          amount: Number(amount), type: type || "full",
+          rrn, agentName: agentName || "Agent",
+          reason: reason || "", status: "initiated",
+          createdAt: Date.now(),
+        };
+        await set(r, final);
+        return final;
+      }
+      async function issueCoupon({ orderId, ticketId, userId, percent, maxAmount, agentName, reason }) {
+        const r = push(ref(rtdb, "coupons"));
+        const code = "RAJA" + Math.random().toString(36).slice(2, 7).toUpperCase();
+        const final = {
+          id: r.key, orderId: orderId || null, ticketId: ticketId || null, userId,
+          code, percent: Number(percent), maxAmount: Number(maxAmount) || 200,
+          agentName: agentName || "Agent",
+          reason: reason || "",
+          validTill: Date.now() + 30 * 24 * 3600 * 1000,
+          createdAt: Date.now(), used: false,
+        };
+        await set(r, final);
+        return final;
+      }
+      function subscribeOrderRefunds(orderId, cb) {
+        return onValue(ref(rtdb, "refunds"), (s) => {
+          if (!s.exists()) return cb([]);
+          cb(Object.values(s.val()).filter((r) => r.orderId === orderId).sort((a, b) => b.createdAt - a.createdAt));
+        });
+      }
+      function subscribeOrderCoupons(orderId, cb) {
+        return onValue(ref(rtdb, "coupons"), (s) => {
+          if (!s.exists()) return cb([]);
+          cb(Object.values(s.val()).filter((r) => r.orderId === orderId).sort((a, b) => b.createdAt - a.createdAt));
+        });
+      }
+      function subscribeUserCoupons(userId, cb) {
+        return onValue(ref(rtdb, "coupons"), (s) => {
+          if (!s.exists()) return cb([]);
+          cb(Object.values(s.val()).filter((r) => r.userId === userId).sort((a, b) => b.createdAt - a.createdAt));
+        });
+      }
+      function subscribeUserRefunds(userId, cb) {
+        return onValue(ref(rtdb, "refunds"), (s) => {
+          if (!s.exists()) return cb([]);
+          cb(Object.values(s.val()).filter((r) => r.userId === userId).sort((a, b) => b.createdAt - a.createdAt));
+        });
+      }
+
       async function fetchUserOrdersOnce(userId) {
         const s = await get(ref(rtdb, "orders"));
         if (!s.exists()) return [];
@@ -806,6 +887,95 @@
         el.textContent = message;
         host.appendChild(el);
         setTimeout(() => el.remove(), 3200);
+      }
+
+      function showOrderPlacedOverlay({ order, restaurant, onDone }) {
+        const overlay = document.createElement("div");
+        overlay.className = "success-overlay";
+        const colors = ["#fc8019", "#ff5722", "#22c55e", "#3b82f6", "#facc15", "#a855f7", "#ec4899"];
+        const confetti = Array.from({ length: 36 }, (_, i) => {
+          const c = colors[i % colors.length];
+          const left = Math.random() * 100;
+          const delay = Math.random() * 0.6;
+          const dur = 1.6 + Math.random() * 1.2;
+          return `<span class="confetti" style="left:${left}%;background:${c};animation-delay:${delay}s;animation-duration:${dur}s"></span>`;
+        }).join("");
+        overlay.innerHTML = `
+          ${confetti}
+          <div class="success-card text-center max-w-sm mx-auto px-6 relative z-10">
+            <svg width="140" height="140" viewBox="0 0 120 120" class="mx-auto">
+              <circle class="success-circle" cx="60" cy="60" r="54" fill="none" stroke="#22c55e" stroke-width="6" stroke-linecap="round" transform="rotate(-90 60 60)"/>
+              <path class="success-tick" d="M38 62 L54 78 L84 46" fill="none" stroke="#22c55e" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <h2 class="font-display font-extrabold text-2xl text-ink-800 mt-4">Order placed!</h2>
+            <p class="text-ink-500 mt-1.5">${escapeHtml(restaurant?.name || "Restaurant")} is preparing your food.</p>
+            <div class="mt-4 inline-flex items-center gap-2 bg-ink-50 text-ink-700 px-3 py-1.5 rounded-full text-xs font-semibold">
+              <span class="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse"></span>
+              Order #${order.id.slice(-6).toUpperCase()} confirmed
+            </div>
+            <div class="mt-5 text-xs text-ink-400">Taking you to live tracking…</div>
+          </div>`;
+        document.body.appendChild(overlay);
+        setTimeout(() => {
+          overlay.style.transition = "opacity 0.35s ease";
+          overlay.style.opacity = "0";
+          setTimeout(() => { overlay.remove(); onDone && onDone(); }, 350);
+        }, 1900);
+      }
+
+      function showAgentActionModal({ title, subtitle, fields, primaryLabel, onSubmit }) {
+        return new Promise((resolve) => {
+          const overlay = document.createElement("div");
+          overlay.className = "fixed inset-0 z-[90] bg-black/40 backdrop-blur-sm grid place-items-center p-4 anim-fade-up";
+          const fieldsHtml = fields.map((f) => {
+            if (f.type === "select") {
+              return `<label class="block">
+                <span class="text-xs font-bold text-ink-700">${escapeHtml(f.label)}</span>
+                <select name="${f.name}" class="w-full mt-1 px-3 py-2.5 rounded-lg border border-ink-200 outline-none ring-glow text-sm">
+                  ${f.options.map((o) => `<option value="${o.value}" ${o.value === f.value ? "selected" : ""}>${escapeHtml(o.label)}</option>`).join("")}
+                </select>
+              </label>`;
+            }
+            if (f.type === "textarea") {
+              return `<label class="block">
+                <span class="text-xs font-bold text-ink-700">${escapeHtml(f.label)}</span>
+                <textarea name="${f.name}" rows="2" placeholder="${escapeHtml(f.placeholder || "")}" class="w-full mt-1 px-3 py-2.5 rounded-lg border border-ink-200 outline-none ring-glow text-sm">${escapeHtml(f.value || "")}</textarea>
+              </label>`;
+            }
+            return `<label class="block">
+              <span class="text-xs font-bold text-ink-700">${escapeHtml(f.label)}</span>
+              <input type="${f.type || "text"}" name="${f.name}" value="${escapeHtml(String(f.value || ""))}" placeholder="${escapeHtml(f.placeholder || "")}" ${f.min !== undefined ? `min="${f.min}"` : ""} ${f.max !== undefined ? `max="${f.max}"` : ""} class="w-full mt-1 px-3 py-2.5 rounded-lg border border-ink-200 outline-none ring-glow text-sm" />
+            </label>`;
+          }).join("");
+          overlay.innerHTML = `
+            <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden anim-scale">
+              <div class="p-5 border-b border-ink-100">
+                <div class="font-display font-bold text-lg text-ink-800">${escapeHtml(title)}</div>
+                ${subtitle ? `<div class="text-sm text-ink-500 mt-0.5">${escapeHtml(subtitle)}</div>` : ""}
+              </div>
+              <form id="modal-form" class="p-5 space-y-3">
+                ${fieldsHtml}
+                <div class="flex items-center justify-end gap-2 pt-2">
+                  <button type="button" id="modal-cancel" class="px-4 py-2 rounded-lg text-ink-600 font-semibold hover:bg-ink-50">Cancel</button>
+                  <button type="submit" class="btn-primary px-4 py-2 rounded-lg text-sm">${escapeHtml(primaryLabel || "Confirm")}</button>
+                </div>
+              </form>
+            </div>`;
+          document.body.appendChild(overlay);
+          const close = (val) => { overlay.remove(); resolve(val); };
+          overlay.querySelector("#modal-cancel").addEventListener("click", () => close(null));
+          overlay.addEventListener("click", (e) => { if (e.target === overlay) close(null); });
+          overlay.querySelector("#modal-form").addEventListener("submit", async (ev) => {
+            ev.preventDefault();
+            const data = Object.fromEntries(new FormData(ev.target).entries());
+            try {
+              const res = onSubmit ? await onSubmit(data) : data;
+              close(res === undefined ? data : res);
+            } catch (e) {
+              toast(e.message || "Failed", "error");
+            }
+          });
+        });
       }
 
       // -----------------------------------------------------------------------
@@ -1329,8 +1499,11 @@
             phone,
           });
           cart.clear();
-          toast("Order placed! Tracking now.", "success");
-          navigate(`#/orders/${order.id}`);
+          showOrderPlacedOverlay({
+            order,
+            restaurant,
+            onDone: () => navigate(`#/orders/${order.id}`),
+          });
         });
       }
 
@@ -1382,16 +1555,21 @@
         shell({
           content: `<div class="max-w-3xl mx-auto px-4 sm:px-6 py-8" id="order-detail"><div class="text-center text-ink-500 py-12">Loading…</div></div>`,
         });
-        const unsub = subscribeOrder(orderId, (o) => {
+        let order = null;
+        let refunds = [];
+        let coupons = [];
+        const repaint = () => {
           const root = $("#order-detail");
           if (!root) return;
-          if (!o) {
+          if (!order) {
             root.innerHTML = `<div class="text-center text-ink-500 py-12">Order not found.</div>`;
             return;
           }
+          const o = order;
           const stages = ["placed", "preparing", "out_for_delivery", "delivered"];
           const idx = o.status === "cancelled" ? -1 : stages.indexOf(o.status);
           const fillPct = idx >= 0 ? Math.round((idx / (stages.length - 1)) * 100) : 0;
+          const totalRefunded = refunds.reduce((s, r) => s + (r.amount || 0), 0);
           root.innerHTML = `
             <a href="#/orders" class="inline-flex items-center gap-2 text-ink-500 hover:text-ink-800 font-semibold mb-4">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
@@ -1441,8 +1619,59 @@
                 <div class="flex justify-between"><span class="text-ink-500">Delivery fee</span><span>${fmt(o.deliveryFee)}</span></div>
                 <div class="flex justify-between"><span class="text-ink-500">Taxes</span><span>${fmt(o.taxes)}</span></div>
                 <div class="flex justify-between text-base font-bold mt-2"><span>Total paid</span><span class="text-brand-600">${fmt(o.total)}</span></div>
+                ${totalRefunded > 0 ? `<div class="flex justify-between text-green-700 font-semibold pt-1"><span>Total refunded</span><span>- ${fmt(totalRefunded)}</span></div>` : ""}
               </div>
             </div>
+
+            ${refunds.length ? `
+              <div class="bg-white border border-green-200 rounded-2xl p-6 mt-5 anim-fade-up">
+                <div class="flex items-center gap-2 mb-3">
+                  <div class="w-8 h-8 rounded-full bg-green-100 grid place-items-center">
+                    <svg class="w-4 h-4 text-green-700" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                  </div>
+                  <h2 class="font-bold text-ink-800">Refund history</h2>
+                </div>
+                <div class="space-y-3">
+                  ${refunds.map((r) => `
+                    <div class="border border-ink-100 rounded-xl p-3 bg-green-50/30">
+                      <div class="flex items-center justify-between">
+                        <div class="font-bold text-ink-800">${fmt(r.amount)} <span class="text-xs font-semibold text-green-700 bg-green-100 px-2 py-0.5 rounded-full ml-1">${r.type === "partial" ? "Partial refund" : "Full refund"}</span></div>
+                        <div class="text-xs text-ink-500">${new Date(r.createdAt).toLocaleString()}</div>
+                      </div>
+                      <div class="text-xs text-ink-500 mt-1">Initiated by <span class="font-semibold text-ink-700">${escapeHtml(r.agentName)}</span></div>
+                      <div class="mt-2 flex items-center gap-2">
+                        <span class="text-[10px] uppercase tracking-wider text-ink-400 font-bold">RRN</span>
+                        <span class="font-mono text-xs bg-white border border-ink-200 px-2 py-1 rounded">${escapeHtml(r.rrn)}</span>
+                      </div>
+                      ${r.reason ? `<div class="text-xs text-ink-600 mt-2 italic">"${escapeHtml(r.reason)}"</div>` : ""}
+                      <div class="text-xs text-ink-500 mt-2">Will reflect in your original payment method within 3-5 business days.</div>
+                    </div>`).join("")}
+                </div>
+              </div>` : ""}
+
+            ${coupons.length ? `
+              <div class="bg-white border border-amber-200 rounded-2xl p-6 mt-5 anim-fade-up">
+                <div class="flex items-center gap-2 mb-3">
+                  <div class="w-8 h-8 rounded-full bg-amber-100 grid place-items-center">
+                    <svg class="w-4 h-4 text-amber-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                  </div>
+                  <h2 class="font-bold text-ink-800">Coupons issued</h2>
+                </div>
+                <div class="space-y-3">
+                  ${coupons.map((c) => `
+                    <div class="border border-dashed border-amber-300 rounded-xl p-3 bg-amber-50/30 flex items-center gap-3">
+                      <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2">
+                          <span class="font-mono font-bold text-base text-amber-700">${escapeHtml(c.code)}</span>
+                          <span class="text-xs font-semibold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">${c.percent}% OFF</span>
+                        </div>
+                        <div class="text-xs text-ink-500 mt-1">Up to ${fmt(c.maxAmount)} off · Valid till ${new Date(c.validTill).toLocaleDateString()}</div>
+                        <div class="text-xs text-ink-500 mt-0.5">Issued by ${escapeHtml(c.agentName)} · ${timeAgo(c.createdAt)}</div>
+                      </div>
+                      <button data-copy-code="${escapeHtml(c.code)}" class="text-xs font-semibold border border-amber-400 text-amber-700 hover:bg-amber-100 px-3 py-1.5 rounded-lg">Copy</button>
+                    </div>`).join("")}
+                </div>
+              </div>` : ""}
 
             <div class="bg-white border border-ink-100 rounded-2xl p-6 mt-5 flex flex-col sm:flex-row sm:items-center gap-3 anim-fade-up">
               <div class="flex-1">
@@ -1460,8 +1689,17 @@
             await cancelOrder(o.id);
             toast("Order cancelled");
           });
-        });
-        currentCleanup = () => unsub();
+          root.querySelectorAll("[data-copy-code]").forEach((b) =>
+            b.addEventListener("click", () => {
+              navigator.clipboard?.writeText(b.dataset.copyCode);
+              toast("Coupon copied", "success");
+            }),
+          );
+        };
+        const u1 = subscribeOrder(orderId, (o) => { order = o; repaint(); });
+        const u2 = subscribeOrderRefunds(orderId, (r) => { refunds = r; repaint(); });
+        const u3 = subscribeOrderCoupons(orderId, (c) => { coupons = c; repaint(); });
+        currentCleanup = () => { u1(); u2(); u3(); };
       }
 
       function renderHelp() {
@@ -1499,7 +1737,11 @@
                   </div>
                 </div>
 
-                <aside class="lg:sticky lg:top-24 self-start">
+                <aside class="lg:sticky lg:top-24 self-start space-y-4">
+                  <div id="trust-card" class="bg-white border border-ink-100 rounded-2xl p-6 shadow-sm">
+                    <div class="text-xs font-semibold text-ink-400 uppercase tracking-wider mb-3">Your trust score</div>
+                    <div class="text-sm text-ink-500">Loading…</div>
+                  </div>
                   <div class="bg-white border border-ink-100 rounded-2xl p-6 text-center shadow-sm">
                     <div class="font-bold text-ink-800 text-lg">Need direct support?</div>
                     <p class="text-sm text-ink-500 mt-1">Open a ticket and our team will reach out to you in chat.</p>
@@ -1511,7 +1753,35 @@
           `,
         });
         const user = getOrCreateUser();
-        const unsub = subscribeUserTickets(user.id, (tickets) => {
+        let myOrders = [];
+        let myTickets = [];
+        function paintTrust() {
+          const card = $("#trust-card");
+          if (!card) return;
+          const score = computeTrustScore(myOrders, myTickets);
+          const badge = trustBadge(score, myOrders.length);
+          const ringColor = score >= 85 ? "stroke-green-500" : score >= 60 ? "stroke-blue-500" : score >= 40 ? "stroke-amber-500" : "stroke-red-500";
+          const completed = myOrders.filter((o) => o.status === "delivered").length;
+          card.innerHTML = `
+            <div class="text-xs font-semibold text-ink-400 uppercase tracking-wider mb-3">Your trust score</div>
+            <div class="flex items-center gap-4">
+              <div class="relative w-20 h-20 shrink-0">
+                <svg class="w-20 h-20 -rotate-90" viewBox="0 0 80 80">
+                  <circle cx="40" cy="40" r="34" stroke="#ece5dc" stroke-width="8" fill="none" />
+                  <circle cx="40" cy="40" r="34" class="${ringColor}" stroke-width="8" fill="none" stroke-linecap="round" stroke-dasharray="${(score / 100) * 213.6} 213.6" />
+                </svg>
+                <div class="absolute inset-0 grid place-items-center font-display font-extrabold text-xl text-ink-800">${score}</div>
+              </div>
+              <div class="min-w-0">
+                <div class="inline-block text-[11px] font-bold px-2 py-1 rounded-full border ${badge.color}">${badge.label}</div>
+                <div class="text-xs text-ink-500 mt-1.5">${completed} delivered · ${myTickets.length} tickets</div>
+              </div>
+            </div>
+            <p class="text-[11px] text-ink-500 mt-3 leading-relaxed">A higher score gets you faster support, priority refunds and exclusive coupons.</p>`;
+        }
+        const unsubTickets = subscribeUserTickets(user.id, (tickets) => {
+          myTickets = tickets;
+          paintTrust();
           const el = $("#my-tickets");
           if (!el) return;
           if (!tickets.length) {
@@ -1528,7 +1798,11 @@
               <div class="text-xs text-ink-400 mt-1">${escapeHtml(t.lastMessagePreview || "")}</div>
             </a>`).join("");
         });
-        currentCleanup = () => unsub();
+        const unsubOrders = subscribeUserOrders(user.id, (orders) => {
+          myOrders = orders;
+          paintTrust();
+        });
+        currentCleanup = () => { unsubTickets(); unsubOrders(); };
       }
 
       function ticketBadgeClass(s) {
@@ -1890,7 +2164,7 @@
                   <h2 class="font-display font-bold text-lg text-ink-800">Inbox</h2>
                   <span id="ticket-count" class="text-xs font-semibold bg-ink-100 text-ink-600 px-2 py-0.5 rounded-full"></span>
                 </div>
-                <input id="ticket-search" placeholder="Search by name, problem..." class="w-full text-sm px-3 py-2 rounded-lg bg-ink-50 outline-none ring-glow" />
+                <input id="ticket-search" placeholder="Search by name, order ID, problem…" class="w-full text-sm px-3 py-2 rounded-lg bg-ink-50 outline-none ring-glow" />
                 <div class="mt-3 flex bg-ink-50 rounded-lg p-1 text-xs font-semibold">
                   <button data-filter="waiting" class="filter-btn flex-1 py-1.5 rounded-md">Waiting</button>
                   <button data-filter="mine" class="filter-btn flex-1 py-1.5 rounded-md">With me</button>
@@ -1937,11 +2211,14 @@
           else if (activeFilter === "mine") list = list.filter((t) => t.agentId === agent.id && t.status !== "resolved");
           else if (activeFilter === "resolved") list = list.filter((t) => t.status === "resolved");
           if (searchQuery) {
-            const q = searchQuery.toLowerCase();
+            const q = searchQuery.toLowerCase().trim();
             list = list.filter((t) =>
               (t.userName || "").toLowerCase().includes(q) ||
               (t.problemLabel || "").toLowerCase().includes(q) ||
-              (t.orderRestaurantName || "").toLowerCase().includes(q),
+              (t.orderRestaurantName || "").toLowerCase().includes(q) ||
+              (t.orderId || "").toLowerCase().includes(q) ||
+              (t.orderId || "").toLowerCase().endsWith(q) ||
+              (t.id || "").toLowerCase().endsWith(q),
             );
           }
           return list;
@@ -1989,7 +2266,10 @@
           });
         }
 
+        let detailUnsubs = [];
         async function openTicketDetail(ticketId) {
+          detailUnsubs.forEach((u) => { try { u(); } catch (_) {} });
+          detailUnsubs = [];
           if (unsubMessages) unsubMessages();
           if (unsubTicket) unsubTicket();
           const root = $("#ticket-detail");
@@ -2001,10 +2281,19 @@
           let userOrders = [];
           let userTickets = [];
           let orderForTicket = null;
-          let dataLoadedOnce = false;
+          let refunds = [];
+          let coupons = [];
+          let userOrdersUnsub = null;
+          let userTicketsUnsub = null;
+          let refundsUnsub = null;
+          let couponsUnsub = null;
+          let lastSubscribedOrderId = null;
+          let pendingDraftText = "";
 
           unsubTicket = subscribeTicket(ticketId, (t) => {
             ticket = t;
+            ensureUserSubs();
+            ensureOrderSubs();
             paintDetail();
           });
           unsubMessages = subscribeTicketMessages(ticketId, (m) => {
@@ -2012,22 +2301,35 @@
             paintDetail(true);
           });
 
-          async function loadProfileAndOrder() {
-            if (!ticket) return;
-            const [orders, tickets] = await Promise.all([
-              fetchUserOrdersOnce(ticket.userId),
-              fetchUserTicketsOnce(ticket.userId),
-            ]);
-            userOrders = orders;
-            userTickets = tickets;
-            orderForTicket = orders.find((o) => o.id === ticket.orderId) || null;
-            dataLoadedOnce = true;
-            paintCustomerPane();
+          function ensureUserSubs() {
+            if (!ticket || userOrdersUnsub) return;
+            userOrdersUnsub = subscribeUserOrders(ticket.userId, (orders) => {
+              userOrders = orders;
+              orderForTicket = orders.find((o) => o.id === ticket.orderId) || null;
+              ensureOrderSubs();
+              paintCustomerPane();
+            });
+            userTicketsUnsub = subscribeUserTickets(ticket.userId, (tk) => {
+              userTickets = tk;
+              paintCustomerPane();
+            });
+            detailUnsubs.push(() => userOrdersUnsub && userOrdersUnsub());
+            detailUnsubs.push(() => userTicketsUnsub && userTicketsUnsub());
+          }
+          function ensureOrderSubs() {
+            if (!ticket || !ticket.orderId) return;
+            if (lastSubscribedOrderId === ticket.orderId) return;
+            if (refundsUnsub) refundsUnsub();
+            if (couponsUnsub) couponsUnsub();
+            lastSubscribedOrderId = ticket.orderId;
+            refundsUnsub = subscribeOrderRefunds(ticket.orderId, (r) => { refunds = r; paintCustomerPane(); });
+            couponsUnsub = subscribeOrderCoupons(ticket.orderId, (c) => { coupons = c; paintCustomerPane(); });
+            detailUnsubs.push(() => refundsUnsub && refundsUnsub());
+            detailUnsubs.push(() => couponsUnsub && couponsUnsub());
           }
 
           function paintDetail(messagesOnly = false) {
             if (!ticket) return;
-            if (!dataLoadedOnce) loadProfileAndOrder();
             const isMine = ticket.agentId === agent.id;
             const claimedByOther = ticket.status === "with_agent" && !isMine;
             const canClaim = ticket.status === "waiting_agent";
@@ -2092,8 +2394,8 @@
             if (!canReply) { bar.innerHTML = ""; return; }
             bar.innerHTML = `
               <div class="border-t border-ink-100 bg-white px-4 py-2.5">
-                <div class="flex items-center gap-2 mb-2">
-                  <span class="text-[10px] uppercase tracking-wider font-bold text-ink-400">Quick replies</span>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-[10px] uppercase tracking-wider font-bold text-ink-400">Quick replies (click to insert, then edit & send)</span>
                 </div>
                 <div class="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
                   ${QUICK_REPLIES.map((q) => `
@@ -2102,18 +2404,17 @@
                 </div>
               </div>`;
             bar.querySelectorAll("[data-qr]").forEach((b) =>
-              b.addEventListener("click", async () => {
+              b.addEventListener("click", () => {
                 const q = QUICK_REPLIES.find((x) => x.id === b.dataset.qr);
                 if (!q) return;
                 const text = q.text.replace("{agent}", agent.name);
-                await postSupportMessage(ticket.id, { sender: "agent", agentName: agent.name, text, createdAt: Date.now() });
-                if (q.id === "thanks") {
-                  setTimeout(async () => {
-                    if (confirm("Mark this ticket as closed now?")) {
-                      await setTicketStatus(ticket.id, "resolved", agent.name);
-                      toast("Ticket closed", "success");
-                    }
-                  }, 200);
+                const input = $("#agent-reply-input");
+                if (input) {
+                  input.value = text;
+                  pendingDraftText = text;
+                  input.focus();
+                  input.setSelectionRange(text.length, text.length);
+                  toast("Inserted into draft. Edit and press Send.", "info");
                 }
               }),
             );
@@ -2123,16 +2424,25 @@
             if (!bar) return;
             if (canReply) {
               bar.innerHTML = `
-                <form id="agent-reply-form" class="border-t border-ink-100 p-3 flex items-center gap-2 bg-white">
-                  <input id="agent-reply-input" autocomplete="off" placeholder="Reply as ${escapeHtml(agent.name)}…" class="flex-1 px-4 py-3 rounded-xl bg-ink-50 outline-none ring-glow" />
-                  <button class="btn-primary px-5 py-3 rounded-xl">Send</button>
+                <form id="agent-reply-form" class="border-t border-ink-100 p-3 flex items-end gap-2 bg-white">
+                  <textarea id="agent-reply-input" rows="1" autocomplete="off" placeholder="Reply as ${escapeHtml(agent.name)}… (Enter to send, Shift+Enter for new line)" class="flex-1 px-4 py-3 rounded-xl bg-ink-50 outline-none ring-glow text-sm resize-none max-h-32"></textarea>
+                  <button type="submit" class="btn-primary px-5 py-3 rounded-xl shrink-0">Send</button>
                 </form>`;
+              const input = $("#agent-reply-input");
+              if (pendingDraftText) { input.value = pendingDraftText; }
+              const autoresize = () => { input.style.height = "auto"; input.style.height = Math.min(input.scrollHeight, 128) + "px"; };
+              input.addEventListener("input", () => { pendingDraftText = input.value; autoresize(); });
+              input.addEventListener("keydown", (ev) => {
+                if (ev.key === "Enter" && !ev.shiftKey) { ev.preventDefault(); $("#agent-reply-form").requestSubmit(); }
+              });
+              autoresize();
               $("#agent-reply-form").addEventListener("submit", async (ev) => {
                 ev.preventDefault();
-                const input = $("#agent-reply-input");
                 const text = input.value.trim();
                 if (!text) return;
                 input.value = "";
+                pendingDraftText = "";
+                autoresize();
                 await postSupportMessage(ticket.id, { sender: "agent", agentName: agent.name, text, createdAt: Date.now() });
               });
             } else if (claimedByOther) {
@@ -2160,6 +2470,7 @@
             const completed = userOrders.filter((o) => o.status === "delivered").length;
             const cancelled = userOrders.filter((o) => o.status === "cancelled").length;
             const ticketsTotal = userTickets.length;
+            const totalRefunded = refunds.reduce((s, r) => s + (r.amount || 0), 0);
             const ringColor = trustScore >= 85 ? "stroke-green-500" : trustScore >= 60 ? "stroke-blue-500" : trustScore >= 40 ? "stroke-amber-500" : "stroke-red-500";
             const initial = (ticket.userName || "C").trim()[0].toUpperCase();
             const ord = orderForTicket;
@@ -2242,6 +2553,7 @@
                       <div class="flex justify-between text-ink-500"><span>Delivery</span><span>${fmt(ord.deliveryFee)}</span></div>
                       <div class="flex justify-between text-ink-500"><span>Taxes</span><span>${fmt(ord.taxes)}</span></div>
                       <div class="flex justify-between font-bold text-ink-800 pt-1"><span>Total paid</span><span class="text-brand-600">${fmt(ord.total)}</span></div>
+                      ${totalRefunded > 0 ? `<div class="flex justify-between text-green-700 font-semibold"><span>Refunded</span><span>- ${fmt(totalRefunded)}</span></div>` : ""}
                     </div>
                     <div class="mt-3 text-xs">
                       <div class="text-[10px] uppercase tracking-wider font-bold text-ink-400 mb-1">Delivery address</div>
@@ -2252,6 +2564,61 @@
                       ${(ord.status === "placed" || ord.status === "preparing") ? `<button id="cancel-order-btn" class="text-xs font-semibold border border-red-300 text-red-600 hover:bg-red-50 px-2 py-1.5 rounded-lg">Cancel order</button>` : `<div></div>`}
                     </div>
                   </div>
+
+                  <div class="p-5 border-b border-ink-100 bg-gradient-to-br from-brand-50/30 to-transparent">
+                    <div class="text-[10px] uppercase tracking-wider font-bold text-ink-400 mb-3">Resolution actions</div>
+                    <div class="grid grid-cols-2 gap-2">
+                      <button id="action-refund" class="text-xs font-bold text-white bg-green-600 hover:bg-green-700 px-3 py-2.5 rounded-lg flex items-center justify-center gap-1.5 transition">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 14l-4-4m0 0l4-4m-4 4h11a4 4 0 010 8h-1"/></svg>
+                        Initiate refund
+                      </button>
+                      <button id="action-coupon" class="text-xs font-bold text-white bg-amber-500 hover:bg-amber-600 px-3 py-2.5 rounded-lg flex items-center justify-center gap-1.5 transition">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                        Generate coupon
+                      </button>
+                    </div>
+                    <div class="text-[10px] text-ink-500 mt-2 leading-relaxed">Refund posts an RRN to chat. Coupon generates a code and sends to customer.</div>
+                  </div>
+
+                  ${refunds.length ? `
+                    <div class="p-5 border-b border-ink-100">
+                      <div class="flex items-center justify-between mb-3">
+                        <div class="text-[10px] uppercase tracking-wider font-bold text-ink-400">Refunds on this order</div>
+                        <span class="text-[10px] font-bold text-green-700 bg-green-100 px-2 py-0.5 rounded-full">${refunds.length}</span>
+                      </div>
+                      <div class="space-y-2">
+                        ${refunds.map((r) => `
+                          <div class="border border-green-200 rounded-lg p-2.5 bg-green-50/40">
+                            <div class="flex items-center justify-between">
+                              <div class="font-bold text-sm text-ink-800">${fmt(r.amount)}</div>
+                              <span class="text-[10px] font-bold text-green-700 bg-green-100 px-1.5 py-0.5 rounded">${r.type === "partial" ? "PARTIAL" : "FULL"}</span>
+                            </div>
+                            <div class="font-mono text-[11px] text-ink-700 mt-1">RRN: ${escapeHtml(r.rrn)}</div>
+                            <div class="text-[10px] text-ink-500 mt-1">By ${escapeHtml(r.agentName)} · ${timeAgo(r.createdAt)}</div>
+                            ${r.reason ? `<div class="text-[10px] text-ink-600 mt-1 italic truncate">"${escapeHtml(r.reason)}"</div>` : ""}
+                          </div>`).join("")}
+                      </div>
+                    </div>` : ""}
+
+                  ${coupons.length ? `
+                    <div class="p-5 border-b border-ink-100">
+                      <div class="flex items-center justify-between mb-3">
+                        <div class="text-[10px] uppercase tracking-wider font-bold text-ink-400">Coupons issued</div>
+                        <span class="text-[10px] font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">${coupons.length}</span>
+                      </div>
+                      <div class="space-y-2">
+                        ${coupons.map((c) => `
+                          <div class="border border-amber-200 rounded-lg p-2.5 bg-amber-50/40">
+                            <div class="flex items-center justify-between">
+                              <span class="font-mono font-bold text-sm text-amber-700">${escapeHtml(c.code)}</span>
+                              <span class="text-[10px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">${c.percent}% OFF</span>
+                            </div>
+                            <div class="text-[10px] text-ink-500 mt-1">Up to ${fmt(c.maxAmount)} · valid till ${new Date(c.validTill).toLocaleDateString()}</div>
+                            <div class="text-[10px] text-ink-500 mt-0.5">By ${escapeHtml(c.agentName)} · ${timeAgo(c.createdAt)}</div>
+                          </div>`).join("")}
+                      </div>
+                    </div>` : ""}
+
                 ` : `<div class="p-5 border-b border-ink-100 text-xs text-ink-500">No order linked to this ticket.</div>`}
 
                 <div class="p-5">
@@ -2277,8 +2644,62 @@
               await cancelOrder(ord.id);
               await postSupportMessage(ticket.id, { sender: "agent", agentName: agent.name, text: "I have cancelled your order. A full refund has been initiated and will reflect in 3 to 5 business days.", createdAt: Date.now() });
               toast("Order cancelled and customer notified", "success");
-              loadProfileAndOrder();
             });
+            $("#action-refund")?.addEventListener("click", () => openRefundModal());
+            $("#action-coupon")?.addEventListener("click", () => openCouponModal());
+          }
+
+          async function openRefundModal() {
+            if (!orderForTicket) { toast("No order linked to this ticket", "error"); return; }
+            const ord = orderForTicket;
+            const data = await showAgentActionModal({
+              title: "Initiate refund",
+              subtitle: `Order #${ord.id.slice(-6).toUpperCase()} · paid ${fmt(ord.total)}`,
+              fields: [
+                { name: "type", label: "Refund type", type: "select", value: "full",
+                  options: [{ value: "full", label: "Full refund" }, { value: "partial", label: "Partial refund" }] },
+                { name: "amount", label: "Refund amount (INR)", type: "number", value: ord.total, min: 1, max: ord.total },
+                { name: "reason", label: "Reason (visible internally)", type: "textarea", placeholder: "e.g. Items missing, food quality issue" },
+              ],
+              primaryLabel: "Initiate refund",
+            });
+            if (!data) return;
+            const amount = Math.min(Number(data.amount), ord.total);
+            const type = data.type;
+            const refund = await initiateRefund({
+              orderId: ord.id, ticketId: ticket.id, userId: ticket.userId,
+              amount, type, agentName: agent.name, reason: data.reason || "",
+            });
+            await postSupportMessage(ticket.id, {
+              sender: "agent", agentName: agent.name,
+              text: `I have initiated a ${type === "partial" ? "partial" : "full"} refund of ${fmt(amount)} on your order. Reference number (RRN): ${refund.rrn}. The amount will reflect in your original payment method within 3 to 5 business days.`,
+              createdAt: Date.now(),
+            });
+            toast(`Refund of ${fmt(amount)} initiated`, "success");
+          }
+          async function openCouponModal() {
+            const data = await showAgentActionModal({
+              title: "Generate coupon",
+              subtitle: `For ${ticket.userName || "customer"} · valid 30 days`,
+              fields: [
+                { name: "percent", label: "Discount %", type: "number", value: 20, min: 5, max: 50 },
+                { name: "maxAmount", label: "Max discount cap (INR)", type: "number", value: 200, min: 50 },
+                { name: "reason", label: "Reason (visible internally)", type: "textarea", placeholder: "e.g. Goodwill for late delivery" },
+              ],
+              primaryLabel: "Generate coupon",
+            });
+            if (!data) return;
+            const coupon = await issueCoupon({
+              orderId: orderForTicket?.id || null, ticketId: ticket.id, userId: ticket.userId,
+              percent: Number(data.percent), maxAmount: Number(data.maxAmount),
+              agentName: agent.name, reason: data.reason || "",
+            });
+            await postSupportMessage(ticket.id, {
+              sender: "agent", agentName: agent.name,
+              text: `As a goodwill gesture, I have added a ${coupon.percent}% off coupon (code: ${coupon.code}, up to ${fmt(coupon.maxAmount)} off) to your account. It is valid for 30 days on your next order.`,
+              createdAt: Date.now(),
+            });
+            toast(`Coupon ${coupon.code} sent to customer`, "success");
           }
         }
 
@@ -2296,6 +2717,8 @@
           unsubAll();
           if (unsubMessages) unsubMessages();
           if (unsubTicket) unsubTicket();
+          detailUnsubs.forEach((u) => { try { u(); } catch (_) {} });
+          detailUnsubs = [];
         };
       }
 
