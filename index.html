@@ -2,326 +2,230 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>IndoChat</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
 <style>
   :root{
     --bg:#000;--bg-2:#0a0a0a;--bg-3:#161616;--bg-4:#1f1f1f;--bg-5:#262626;
-    --accent:#0095f6;--accent-2:#1877f2;--accent-glow:rgba(0,149,246,.3);
+    --accent:#0095f6;--accent-2:#1877f2;
     --text:#fafafa;--text-2:#a8a8a8;--text-3:#737373;
-    --border:#262626;--border-2:#363636;
-    --danger:#ed4956;--danger-2:#c13584;
-    --warn:#f5b400;--ok:#2ecc71;--ok-2:#27ae60;
-    --purple:#a855f7;--teal:#14b8a6;
-    --shadow:0 4px 24px rgba(0,0,0,.5);--shadow-lg:0 20px 60px rgba(0,0,0,.7);
+    --border:#262626;--danger:#ed4956;--warn:#f5b400;--ok:#2ecc71;--purple:#a855f7;
+    --shadow:0 4px 24px rgba(0,0,0,.5);
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   html,body{height:100%;font-family:'Inter',-apple-system,sans-serif}
   body{background:var(--bg);color:var(--text);overflow:hidden;font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
   button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
   input,textarea,select{font-family:inherit}
-  ::-webkit-scrollbar{width:6px;height:6px}
-  ::-webkit-scrollbar-thumb{background:#363636;border-radius:3px}
+  ::-webkit-scrollbar{width:4px;height:4px}
+  ::-webkit-scrollbar-thumb{background:#333;border-radius:2px}
+  img{max-width:100%}
 
   /* AUTH */
   #authScreen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px;z-index:10}
-  .auth-card{width:100%;max-width:380px;background:var(--bg-2);border:1px solid var(--border);border-radius:12px;padding:40px 36px}
-  .auth-logo{text-align:center;font-size:30px;font-weight:800;margin-bottom:6px;font-family:'Inter',sans-serif}
-  .auth-sub{text-align:center;color:var(--text-2);font-size:13px;margin-bottom:28px}
-  .field{margin-bottom:12px}
+  .auth-card{width:100%;max-width:360px}
+  .auth-logo{text-align:center;font-size:32px;font-weight:800;margin-bottom:32px;font-family:'Inter',sans-serif}
+  .field{margin-bottom:10px}
   .field label{display:block;font-size:12px;color:var(--text-2);margin-bottom:6px;font-weight:500}
   .field .input-wrap{position:relative}
-  .field .input-wrap .prefix{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-2);font-size:14px;font-weight:500;pointer-events:none}
-  .field input,.field textarea,.field select{width:100%;padding:12px 14px;background:var(--bg-3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;outline:none;transition:.15s}
-  .field input.with-prefix{padding-left:42px}
-  .field input:focus,.field textarea:focus,.field select:focus{border-color:var(--text-3);background:var(--bg-4)}
+  .field .input-wrap .prefix{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-2);font-size:14px;pointer-events:none}
+  .field input,.field textarea,.field select{width:100%;padding:12px;background:var(--bg-3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;outline:none;transition:.15s}
+  .field input.with-prefix{padding-left:40px}
+  .field input:focus,.field textarea:focus{border-color:var(--text-3);background:var(--bg-4)}
   .field textarea{resize:vertical;min-height:80px}
   .field .err{color:var(--danger);font-size:11px;margin-top:4px;min-height:14px}
   .field .hint{color:var(--text-3);font-size:11px;margin-top:4px}
-  .btn{padding:12px;border-radius:8px;font-weight:600;font-size:14px;transition:.15s;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;cursor:pointer}
+  .btn{padding:12px;border-radius:10px;font-weight:600;font-size:14px;transition:.15s;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;cursor:pointer}
   .btn-primary{background:var(--accent);color:#fff}
   .btn-primary:hover{background:var(--accent-2)}
   .btn-primary:disabled{background:var(--bg-5);color:var(--text-3);cursor:not-allowed}
   .btn-ghost{background:var(--bg-3);color:var(--text);border:1px solid var(--border)}
   .btn-ghost:hover{background:var(--bg-4)}
   .btn-danger{background:var(--danger);color:#fff}
-  .btn-danger:hover{background:var(--danger-2)}
   .btn-ok{background:var(--ok);color:#fff}
-  .btn-ok:hover{background:var(--ok-2)}
   .btn-text{background:transparent;color:var(--accent);font-size:13px;font-weight:600;padding:8px;cursor:pointer}
-  .btn-text:hover{color:var(--accent-2)}
   .switch-mode{text-align:center;margin-top:16px;color:var(--text-2);font-size:13px}
   .switch-mode a{color:var(--accent);cursor:pointer;font-weight:600}
-  .form-footnote{font-size:11px;color:var(--text-3);text-align:center;margin-top:20px;line-height:1.6}
 
-  /* CHAT */
-  #chatApp{display:none;height:100vh;width:100vw}
-  #chatApp.active{display:grid;grid-template-columns:350px 1fr}
+  /* CHAT - mobile first */
+  #chatApp{display:none;height:100vh;height:100dvh;width:100vw}
+  #chatApp.active{display:grid;grid-template-columns:1fr}
+  @media(min-width:769px){#chatApp.active{grid-template-columns:360px 1fr}}
   .sidebar{background:var(--bg-2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
-  .sidebar-header{padding:14px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
-  .sidebar-header .me{display:flex;align-items:center;gap:10px}
-  .avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--danger-2));display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:15px;flex-shrink:0}
-  .me-info .name{font-weight:600;font-size:14px}
+  .sidebar.hide-mobile{display:none}
+  .sidebar-header{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+  .sidebar-header .me{display:flex;align-items:center;gap:10px;cursor:pointer}
+  .avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:15px;flex-shrink:0;overflow:hidden}
+  .avatar img{width:100%;height:100%;object-fit:cover}
+  .me-info .name{font-weight:600;font-size:14px;display:flex;align-items:center;gap:4px}
+  .verified-badge{display:inline-flex;width:16px;height:16px;align-items:center;justify-content:center}
+  .verified-badge svg{width:14px;height:14px}
   .me-info .status{font-size:11px;color:var(--text-2)}
   .header-actions{display:flex;gap:4px}
-  .icon-btn{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--text-2);transition:.15s;position:relative;cursor:pointer}
+  .icon-btn{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--text-2);transition:.15s;cursor:pointer;position:relative}
   .icon-btn:hover{background:var(--bg-3);color:var(--text)}
-  .badge{position:absolute;top:4px;right:4px;min-width:16px;height:16px;border-radius:8px;background:var(--danger);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px}
   .search-bar{padding:8px 12px;border-bottom:1px solid var(--border);position:relative}
   .search-wrap{background:var(--bg-3);border-radius:8px;display:flex;align-items:center;padding:0 10px}
   .search-wrap input{background:transparent;border:none;outline:none;padding:9px 8px;color:var(--text);font-size:13px;flex:1}
   .search-results{position:absolute;top:48px;left:12px;right:12px;background:var(--bg-3);border:1px solid var(--border);border-radius:8px;max-height:280px;overflow-y:auto;box-shadow:var(--shadow);z-index:5;display:none}
   .search-results.active{display:block}
-  .search-result-item{padding:10px 12px;display:flex;align-items:center;gap:10px;cursor:pointer;border-bottom:1px solid var(--border)}
-  .search-result-item:last-child{border-bottom:none}
+  .search-result-item{padding:10px 12px;display:flex;align-items:center;gap:10px;cursor:pointer}
   .search-result-item:hover{background:var(--bg-4)}
-  .sr-avatar{width:36px;height:36px;border-radius:50%;background:var(--bg-5);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px}
-  .sr-name{font-size:13px;font-weight:500;flex:1}
+  .sr-name{font-size:13px;font-weight:500;flex:1;display:flex;align-items:center;gap:4px}
   .sr-add{background:var(--accent);color:#fff;padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600}
   .chat-list{flex:1;overflow-y:auto}
-  .chat-list-item{padding:12px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;border-bottom:1px solid var(--border);transition:.1s}
+  .chat-list-item{padding:12px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;border-bottom:1px solid var(--border)}
   .chat-list-item:hover{background:var(--bg-3)}
   .cl-info{flex:1;min-width:0}
-  .cl-name{font-weight:600;font-size:14px}
+  .cl-name{font-weight:600;font-size:14px;display:flex;align-items:center;gap:4px}
   .cl-last{font-size:12px;color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
-  .empty-list{padding:40px 20px;text-align:center;color:var(--text-3);font-size:12px;line-height:1.7}
+  .empty-list{padding:40px 20px;text-align:center;color:var(--text-3);font-size:13px;line-height:1.7}
 
-  .chat-area{display:flex;flex-direction:column;background:var(--bg)}
-  .chat-header{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+  .chat-area{display:flex;flex-direction:column;background:var(--bg);overflow:hidden}
+  .chat-area.hide-mobile{display:none}
+  .chat-header{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
   .ch-info{flex:1;min-width:0}
-  .ch-info .name{font-weight:600;font-size:14px}
+  .ch-info .name{font-weight:600;font-size:14px;display:flex;align-items:center;gap:4px}
   .ch-info .status{font-size:11px;color:var(--text-2)}
-  .messages{flex:1;overflow-y:auto;padding:20px 8%}
-  .msg{display:flex;margin-bottom:6px;animation:msgIn .2s ease}
-  @keyframes msgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  .messages{flex:1;overflow-y:auto;padding:16px 12px;-webkit-overflow-scrolling:touch}
+  .msg{display:flex;margin-bottom:4px;animation:msgIn .15s ease}
+  @keyframes msgIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
   .msg.sent{justify-content:flex-end}
-  .msg .bubble{max-width:60%;padding:8px 12px;border-radius:18px;font-size:14px;line-height:1.4;word-wrap:break-word}
+  .msg .bubble{max-width:75%;padding:8px 12px;border-radius:18px;font-size:14px;line-height:1.4;word-wrap:break-word}
   .msg.sent .bubble{background:var(--accent);color:#fff;border-bottom-right-radius:4px}
   .msg.received .bubble{background:var(--bg-3);color:var(--text);border-bottom-left-radius:4px}
-  .msg .meta{font-size:10px;color:var(--text-3);margin-top:2px;text-align:right}
-  .msg.sent .meta{color:rgba(255,255,255,.6)}
-  .day-wrap{text-align:center;margin:16px 0}
-  .msg-day{display:inline-block;color:var(--text-3);font-size:11px;padding:4px 12px;background:var(--bg-3);border-radius:8px}
-  .composer{padding:10px 16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px}
-  .composer input{flex:1;background:var(--bg-3);border:none;border-radius:22px;padding:11px 16px;color:var(--text);font-size:14px;outline:none}
-  .send-btn{width:40px;height:40px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;transition:.1s;cursor:pointer}
-  .send-btn:hover{background:var(--accent-2)}
-  .send-btn:disabled{background:var(--bg-5);cursor:not-allowed}
-  .no-chat{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text-2);gap:14px;padding:20px}
-  .nc-icon{width:80px;height:80px;border-radius:50%;background:var(--bg-3);display:flex;align-items:center;justify-content:center}
-  .no-chat h3{font-weight:600;font-size:18px}
-  .no-chat p{font-size:13px;text-align:center;max-width:320px;line-height:1.6}
+  .msg .meta{font-size:9px;color:var(--text-3);margin-top:2px;text-align:right}
+  .msg.sent .meta{color:rgba(255,255,255,.5)}
+  .day-wrap{text-align:center;margin:12px 0}
+  .msg-day{display:inline-block;color:var(--text-3);font-size:10px;padding:3px 10px;background:var(--bg-3);border-radius:6px}
+  .composer{padding:8px 12px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px}
+  .composer input{flex:1;background:var(--bg-3);border:none;border-radius:22px;padding:10px 14px;color:var(--text);font-size:14px;outline:none}
+  .send-btn{width:38px;height:38px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+  .send-btn:disabled{background:var(--bg-5)}
+  .no-chat{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text-2);gap:14px;padding:20px;text-align:center}
+  .back-btn{display:none;width:36px;height:36px;align-items:center;justify-content:center;cursor:pointer;color:var(--text)}
+  @media(max-width:768px){.back-btn{display:flex}}
 
   /* OVERLAYS */
   .overlay{position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;padding:20px}
-  .overlay.active{display:flex;animation:fadeIn .25s ease}
+  .overlay.active{display:flex;animation:fadeIn .2s ease}
   @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-  .overlay-bg{background:rgba(0,0,0,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
-
-  /* Instagram-style full-screen overlays */
-  .ig-fullscreen{background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:40px 20px}
-  .ig-screen{width:100%;max-width:400px;text-align:center;animation:slideUp .4s ease}
-  @keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-
-  .ig-screen-icon{width:96px;height:96px;border-radius:50%;margin:0 auto 32px;display:flex;align-items:center;justify-content:center;position:relative}
-  .ig-screen-icon.suspended{background:rgba(245,180,0,.1);color:var(--warn)}
-  .ig-screen-icon.disabled{background:rgba(237,73,86,.1);color:var(--danger)}
-  .ig-screen-icon.reinstated{background:rgba(46,204,113,.1);color:var(--ok)}
-  .ig-screen-icon::after{content:'';position:absolute;inset:-8px;border-radius:50%;border:2px solid currentColor;opacity:.15}
-  .ig-screen-icon.disabled::after{border-style:dashed;animation:spin 12s linear infinite}
-  .ig-screen-icon.reinstated .pulse{position:absolute;inset:-10px;border-radius:50%;border:2px solid var(--ok);opacity:.3;animation:pulseRing 2s ease-out infinite}
-  @keyframes pulseRing{0%{transform:scale(1);opacity:.4}100%{transform:scale(1.5);opacity:0}}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .ig-screen-icon svg{width:44px;height:44px}
-
-  .ig-screen-title{font-size:24px;font-weight:700;letter-spacing:-.5px;margin-bottom:8px;color:#fff}
-  .ig-screen-desc{font-size:14px;color:var(--text-2);line-height:1.6;margin-bottom:28px;max-width:340px;margin-left:auto;margin-right:auto}
-
-  .ig-screen-reason{background:var(--bg-3);border-radius:12px;padding:16px;margin-bottom:24px;text-align:left}
-  .ig-screen-reason .label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-3);margin-bottom:6px}
-  .ig-screen-reason.suspended .label{color:var(--warn)}
-  .ig-screen-reason.disabled .label{color:var(--danger)}
-  .ig-screen-reason.reinstated .label{color:var(--ok)}
-  .ig-screen-reason .text{font-size:14px;color:var(--text);line-height:1.6}
-
-  .ig-screen-info{font-size:12px;color:var(--text-3);margin-bottom:28px;line-height:1.8}
-  .ig-screen-info span{color:var(--text-2)}
-
-  .ig-screen-actions{display:flex;flex-direction:column;gap:10px}
-  .ig-screen-actions .btn{width:100%;padding:14px;border-radius:10px;font-weight:600;font-size:15px;cursor:pointer;transition:.15s;display:flex;align-items:center;justify-content:center;gap:8px}
-  .ig-screen-actions .btn-primary{background:#0095f6;color:#fff}
-  .ig-screen-actions .btn-primary:hover{background:#1877f2}
-  .ig-screen-actions .btn-primary:disabled{background:var(--bg-5);color:var(--text-3);cursor:not-allowed}
-  .ig-screen-actions .btn-ghost{background:var(--bg-3);color:var(--text);border:1px solid var(--border)}
-  .ig-screen-actions .btn-ghost:hover{background:var(--bg-4)}
-  .ig-screen-actions .btn-ok{background:var(--ok);color:#fff}
-  .ig-screen-actions .btn-ok:hover{background:var(--ok-2)}
-  .ig-screen-actions .btn-text{background:transparent;color:var(--text-2);font-size:13px;font-weight:500;padding:8px}
-  .ig-screen-actions .btn-text:hover{color:var(--text)}
-
-  .ig-screen-note{font-size:11px;color:var(--text-3);margin-top:20px;line-height:1.5}
-
-  .ig-guidelines{background:var(--bg-3);border-radius:12px;padding:16px;text-align:left;margin:20px 0}
-  .ig-guidelines h4{font-size:11px;color:var(--text-3);margin-bottom:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px}
-  .ig-guidelines ul{list-style:none;padding:0}
-  .ig-guidelines li{font-size:13px;color:var(--text);padding:8px 0 8px 20px;position:relative;line-height:1.5;border-bottom:1px solid var(--border)}
-  .ig-guidelines li:last-child{border-bottom:none}
-  .ig-guidelines li::before{content:'';position:absolute;left:0;top:14px;width:6px;height:6px;border-radius:50%;background:var(--ok)}
-
-  .card{width:100%;max-width:420px;background:var(--bg-2);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:var(--shadow-lg);animation:slideUp .3s ease;max-height:92vh;display:flex;flex-direction:column}
+  .overlay-bg{background:rgba(0,0,0,.95);backdrop-filter:blur(20px)}
+  .ig-screen{width:100%;max-width:380px;text-align:center;animation:slideUp .3s ease}
   @keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-
-  .card-head{padding:36px 32px 24px;text-align:center;border-bottom:1px solid var(--border);position:relative}
-  .card-head.danger{background:linear-gradient(180deg,rgba(237,73,86,.08) 0%,transparent 100%)}
-  .card-head.warn{background:linear-gradient(180deg,rgba(245,180,0,.08) 0%,transparent 100%)}
-  .card-head.ok{background:linear-gradient(180deg,rgba(46,204,113,.08) 0%,transparent 100%)}
-  .card-head.info{background:linear-gradient(180deg,rgba(0,149,246,.08) 0%,transparent 100%)}
-
-  .icon-circle{width:80px;height:80px;border-radius:50%;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;position:relative}
-  .icon-circle.danger{background:rgba(237,73,86,.12);color:var(--danger)}
-  .icon-circle.warn{background:rgba(245,180,0,.12);color:var(--warn)}
-  .icon-circle.ok{background:rgba(46,204,113,.12);color:var(--ok)}
-  .icon-circle.info{background:rgba(0,149,246,.12);color:var(--accent)}
-  .icon-circle::after{content:'';position:absolute;inset:-6px;border-radius:50%;border:2px solid currentColor;opacity:.2}
-  .icon-circle.danger::after{border-style:dashed;animation:spin 12s linear infinite}
-  .icon-circle.ok .pulse{position:absolute;inset:-8px;border-radius:50%;border:2px solid var(--ok);opacity:.4;animation:pulseRing 1.8s ease-out infinite}
-  @keyframes pulseRing{0%{transform:scale(1);opacity:.5}100%{transform:scale(1.4);opacity:0}}
+  .ig-icon{width:80px;height:80px;border-radius:50%;margin:0 auto 24px;display:flex;align-items:center;justify-content:center;position:relative}
+  .ig-icon.warn{background:rgba(245,180,0,.1);color:var(--warn)}
+  .ig-icon.danger{background:rgba(237,73,86,.1);color:var(--danger)}
+  .ig-icon.ok{background:rgba(46,204,113,.1);color:var(--ok)}
+  .ig-icon.info{background:rgba(0,149,246,.1);color:var(--accent)}
+  .ig-icon::after{content:'';position:absolute;inset:-6px;border-radius:50%;border:2px solid currentColor;opacity:.15}
+  .ig-icon.danger::after{border-style:dashed;animation:spin 12s linear infinite}
+  .ig-icon.ok .pulse{position:absolute;inset:-8px;border-radius:50%;border:2px solid var(--ok);opacity:.3;animation:pulseRing 2s ease-out infinite}
+  @keyframes pulseRing{0%{transform:scale(1);opacity:.4}100%{transform:scale(1.4);opacity:0}}
   @keyframes spin{to{transform:rotate(360deg)}}
-
-  .card-title{font-size:22px;font-weight:700;letter-spacing:-.3px;margin-bottom:6px}
-  .card-subtitle{font-size:11px;color:var(--text-2);font-weight:600;text-transform:uppercase;letter-spacing:.8px}
-  .card-body{padding:24px 32px;overflow-y:auto;flex:1}
-  .card-desc{color:var(--text-2);font-size:13.5px;line-height:1.6;margin-bottom:18px;text-align:center}
-  .meta-box{background:var(--bg-3);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:16px}
-  .meta-row{display:flex;justify-content:space-between;padding:6px 0;font-size:12.5px;align-items:flex-start;gap:10px;border-bottom:1px solid var(--border)}
-  .meta-row:last-child{border-bottom:none}
-  .meta-row .k{color:var(--text-2);flex-shrink:0;font-weight:500}
-  .meta-row .v{color:var(--text);font-weight:600;text-align:right;word-break:break-word;max-width:60%}
-  .meta-row .v.mono{font-family:'JetBrains Mono',monospace;font-size:11px}
-
-  .reason-box{border-radius:12px;padding:14px;margin-bottom:16px;border:1px solid;border-left-width:3px}
-  .reason-box.danger{background:rgba(237,73,86,.06);border-color:rgba(237,73,86,.3);border-left-color:var(--danger)}
-  .reason-box.warn{background:rgba(245,180,0,.06);border-color:rgba(245,180,0,.3);border-left-color:var(--warn)}
-  .reason-box.ok{background:rgba(46,204,113,.06);border-color:rgba(46,204,113,.3);border-left-color:var(--ok)}
-  .reason-box.info{background:rgba(0,149,246,.06);border-color:rgba(0,149,246,.3);border-left-color:var(--accent)}
-  .reason-box .rb-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
-  .reason-box.danger .rb-label{color:var(--danger)}
-  .reason-box.warn .rb-label{color:var(--warn)}
-  .reason-box.ok .rb-label{color:var(--ok)}
-  .reason-box.info .rb-label{color:var(--accent)}
-  .reason-box .rb-text{font-size:13px;color:var(--text);line-height:1.6}
-
-  .card-foot{padding:16px 32px 24px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px}
-  .card-foot .btn{width:100%}
-  .foot-note{text-align:center;font-size:11px;color:var(--text-3);margin-top:6px;line-height:1.5}
-
-  .guidelines{background:var(--bg-3);border-radius:12px;padding:16px;text-align:left;margin:18px 0;border:1px solid var(--border)}
-  .guidelines h4{font-size:12px;color:var(--accent);margin-bottom:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
-  .guidelines ul{list-style:none;padding:0}
-  .guidelines li{font-size:12.5px;color:var(--text);padding:7px 0 7px 20px;position:relative;line-height:1.5;border-bottom:1px solid var(--border)}
-  .guidelines li:last-child{border-bottom:none}
-  .guidelines li::before{content:'';position:absolute;left:0;top:13px;width:6px;height:6px;border-radius:50%;background:var(--accent)}
-
-  .steps{display:flex;justify-content:center;gap:6px;margin-bottom:20px}
-  .step-dot{width:40px;height:4px;border-radius:2px;background:var(--bg-5);transition:.3s}
-  .step-dot.active{background:var(--accent)}
-  .step-dot.done{background:var(--ok)}
-
-  .captcha-box{background:var(--bg-3);border-radius:12px;padding:20px;text-align:center;margin-bottom:16px;border:1px solid var(--border)}
-  .captcha-canvas{background:repeating-linear-gradient(45deg,#262626,#262626 8px,#1f1f1f 8px,#1f1f1f 16px);border-radius:8px;padding:16px;margin:0 auto 12px;font-family:'JetBrains Mono',monospace;font-size:30px;font-weight:700;letter-spacing:8px;color:#fafafa;user-select:none;display:inline-block;position:relative;overflow:hidden}
-  .captcha-canvas::after{content:'';position:absolute;top:50%;left:0;right:0;height:2px;background:rgba(255,255,255,.1);transform:rotate(-3deg)}
-  .captcha-canvas span{display:inline-block;transform:skew(-6deg)}
-  .captcha-canvas span:nth-child(odd){transform:skew(6deg) translateY(2px)}
-  .captcha-box label{display:block;font-size:12px;color:var(--text-2);margin-bottom:8px;text-align:left}
-  .captcha-box input{width:100%;padding:11px 14px;background:var(--bg-2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;outline:none;text-align:center;letter-spacing:4px;font-weight:600;text-transform:uppercase;font-family:'JetBrains Mono',monospace}
-  .captcha-box input:focus{border-color:var(--accent)}
-  .refresh-captcha{color:var(--text-2);font-size:11px;margin-top:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px}
-  .refresh-captcha:hover{color:var(--accent)}
-
-  .face-step{text-align:center}
-  .face-video-wrap{position:relative;width:220px;height:220px;margin:0 auto 14px;border-radius:50%;overflow:hidden;background:#000;border:3px solid var(--accent);box-shadow:0 0 30px var(--accent-glow),inset 0 0 60px rgba(0,0,0,.5)}
-  .face-video-wrap video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
-  .face-overlay-frame{position:absolute;inset:0;pointer-events:none}
-  .face-overlay-frame::before,.face-overlay-frame::after{content:'';position:absolute;width:50px;height:50px;border:3px solid var(--accent)}
-  .face-overlay-frame::before{top:25%;left:20%;border-right:none;border-bottom:none;border-radius:10px 0 0 0}
-  .face-overlay-frame::after{bottom:25%;right:20%;border-left:none;border-top:none;border-radius:0 0 10px 0}
-  .face-scan-line{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);box-shadow:0 0 12px var(--accent);animation:scanMove 2.5s linear infinite;pointer-events:none}
-  @keyframes scanMove{0%{top:10%}50%{top:90%}100%{top:10%}}
-  .face-overlay-canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-  .capture-flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;border-radius:50%}
-  .capture-flash.flashing{animation:flash .6s ease-out}
-  @keyframes flash{0%{opacity:0}20%{opacity:.9}100%{opacity:0}}
-  .face-loading{position:absolute;inset:0;background:rgba(0,0,0,.9);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:var(--text);font-size:12px;text-align:center;padding:20px;border-radius:50%}
-  .face-loading .spinner{width:36px;height:36px;border:3px solid var(--bg-5);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
-
-  .dir-arrow{font-size:48px;margin:8px 0;animation:pulseArrow 1.2s infinite ease-in-out}
-  @keyframes pulseArrow{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.15);opacity:.7}}
-  .dir-text{font-size:15px;color:var(--text);margin-bottom:12px;font-weight:600}
-  .dir-progress{display:flex;justify-content:center;gap:8px;margin-bottom:14px}
-  .dir-step{width:42px;height:42px;border-radius:10px;background:var(--bg-3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--text-2);transition:.3s}
-  .dir-step.active{border-color:var(--accent);color:var(--accent);box-shadow:0 0 12px var(--accent-glow)}
-  .dir-step.done{background:var(--ok);color:#fff;border-color:var(--ok)}
-
-  .auto-bar{width:100%;height:8px;background:var(--bg-5);border-radius:4px;overflow:hidden;margin:10px 0}
-  .auto-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--ok));border-radius:4px;transition:width .15s}
-  .auto-fill.complete{background:var(--ok)}
-  .motion-status{font-size:12px;color:var(--text-2);min-height:18px;font-weight:500}
-  .motion-status.ready{color:var(--ok)}
-  .motion-status.wrong{color:var(--danger)}
-  .motion-status.error{color:var(--danger)}
-  .info-banner{background:rgba(0,149,246,.08);border:1px solid rgba(0,149,246,.3);border-radius:8px;padding:10px;margin-bottom:14px;font-size:11px;color:var(--accent);line-height:1.5;text-align:left}
+  .ig-icon svg{width:40px;height:40px}
+  .ig-title{font-size:22px;font-weight:700;margin-bottom:8px}
+  .ig-desc{font-size:14px;color:var(--text-2);line-height:1.6;margin-bottom:24px}
+  .ig-reason{background:var(--bg-3);border-radius:12px;padding:14px;margin-bottom:20px;text-align:left}
+  .ig-reason .lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-3);margin-bottom:6px}
+  .ig-reason.warn .lbl{color:var(--warn)}
+  .ig-reason.danger .lbl{color:var(--danger)}
+  .ig-reason.ok .lbl{color:var(--ok)}
+  .ig-reason .txt{font-size:13px;color:var(--text);line-height:1.5}
+  .ig-info{font-size:12px;color:var(--text-3);margin-bottom:24px;line-height:1.8}
+  .ig-info span{color:var(--text-2)}
+  .ig-actions{display:flex;flex-direction:column;gap:8px}
+  .ig-actions .btn{width:100%;padding:13px;font-size:14px}
+  .ig-note{font-size:11px;color:var(--text-3);margin-top:16px}
 
   /* MODAL */
-  .modal{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(8px);z-index:1100;display:none;align-items:center;justify-content:center;padding:20px}
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);z-index:1100;display:none;align-items:center;justify-content:center;padding:16px}
   .modal.active{display:flex;animation:fadeIn .2s ease}
-  .modal-card{width:100%;max-width:480px;background:var(--bg-2);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-lg);animation:slideUp .25s ease;max-height:90vh;overflow:hidden;display:flex;flex-direction:column}
-  .mc-head{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
-  .mc-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .modal-card{width:100%;max-width:440px;background:var(--bg-2);border:1px solid var(--border);border-radius:16px;overflow:hidden;animation:slideUp .25s ease;max-height:90vh;display:flex;flex-direction:column}
+  .mc-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+  .mc-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
   .mc-icon.info{background:rgba(0,149,246,.15);color:var(--accent)}
   .mc-icon.warn{background:rgba(245,180,0,.15);color:var(--warn)}
   .mc-icon.danger{background:rgba(237,73,86,.15);color:var(--danger)}
   .mc-icon.ok{background:rgba(46,204,113,.15);color:var(--ok)}
-  .mc-title{font-weight:700;font-size:16px}
+  .mc-title{font-weight:700;font-size:15px}
   .mc-subtitle{font-size:11px;color:var(--text-2);margin-top:2px}
-  .mc-body{padding:20px 22px;overflow-y:auto;flex:1}
-  .mc-actions{padding:0 22px 18px;display:flex;gap:10px}
+  .mc-body{padding:18px 20px;overflow-y:auto;flex:1}
+  .mc-actions{padding:0 20px 16px;display:flex;gap:8px}
   .mc-actions .btn{flex:1}
 
-  .wiz-progress{display:flex;align-items:center;gap:6px;margin-bottom:18px}
-  .wiz-num{width:28px;height:28px;border-radius:50%;background:var(--bg-5);color:var(--text-2);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.2s}
+  /* Wizard */
+  .wiz-progress{display:flex;align-items:center;gap:6px;margin-bottom:16px}
+  .wiz-num{width:26px;height:26px;border-radius:50%;background:var(--bg-5);color:var(--text-2);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
   .wiz-num.active{background:var(--accent);color:#fff}
   .wiz-num.done{background:var(--ok);color:#fff}
-  .wiz-line{flex:1;height:2px;background:var(--bg-5);border-radius:1px;transition:.2s}
+  .wiz-line{flex:1;height:2px;background:var(--bg-5);border-radius:1px}
   .wiz-line.done{background:var(--ok)}
-  .wiz-step{display:none}
-  .wiz-step.active{display:block;animation:fadeIn .2s}
 
-  .inbox-list{max-height:60vh;overflow-y:auto}
-  .inbox-item{background:var(--bg-3);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;cursor:pointer;transition:.1s}
-  .inbox-item:hover{border-color:var(--text-3)}
-  .inbox-item.unread{border-left:3px solid var(--accent)}
-  .ii-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
-  .ii-title{font-weight:600;font-size:13px}
-  .ii-time{font-size:10px;color:var(--text-3)}
-  .ii-preview{font-size:12px;color:var(--text-2);line-height:1.5}
+  /* Captcha */
+  .captcha-canvas{background:repeating-linear-gradient(45deg,#262626,#262626 8px,#1f1f1f 8px,#1f1f1f 16px);border-radius:8px;padding:14px;margin:0 auto 10px;font-family:monospace;font-size:28px;font-weight:700;letter-spacing:6px;color:#fafafa;user-select:none;display:inline-block}
+  .captcha-canvas span{display:inline-block;transform:skew(-6deg)}
+  .captcha-canvas span:nth-child(odd){transform:skew(6deg) translateY(2px)}
 
-  .toast{position:fixed;top:20px;right:20px;background:var(--bg-3);border:1px solid var(--border);color:var(--text);padding:12px 16px;border-radius:10px;font-size:13px;z-index:3000;box-shadow:var(--shadow);animation:toastIn .3s ease;max-width:340px}
-  @keyframes toastIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+  /* Face verification */
+  .face-wrap{position:relative;width:200px;height:200px;margin:0 auto 12px;border-radius:50%;overflow:hidden;background:#000;border:3px solid var(--accent)}
+  .face-wrap video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+  .face-overlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+  .face-flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;border-radius:50%}
+  .face-flash.flashing{animation:flash .5s ease-out}
+  @keyframes flash{0%{opacity:0}20%{opacity:.9}100%{opacity:0}}
+  .face-loading{position:absolute;inset:0;background:rgba(0,0,0,.9);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:var(--text);font-size:12px;text-align:center;padding:16px;border-radius:50%}
+  .face-loading .spinner{width:32px;height:32px;border:3px solid var(--bg-5);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+  .dir-arrow{font-size:40px;margin:6px 0;animation:pulseArrow 1.2s infinite ease-in-out}
+  @keyframes pulseArrow{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.15);opacity:.7}}
+  .dir-text{font-size:14px;font-weight:600;margin-bottom:10px}
+  .dir-steps{display:flex;justify-content:center;gap:6px;margin-bottom:10px}
+  .dir-step{width:36px;height:36px;border-radius:8px;background:var(--bg-3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--text-2)}
+  .dir-step.active{border-color:var(--accent);color:var(--accent)}
+  .dir-step.done{background:var(--ok);color:#fff;border-color:var(--ok)}
+  .auto-bar{width:100%;height:6px;background:var(--bg-5);border-radius:3px;overflow:hidden;margin:8px 0}
+  .auto-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--ok));border-radius:3px;transition:width .12s}
+  .auto-fill.complete{background:var(--ok)}
+  .motion-status{font-size:11px;color:var(--text-2);min-height:16px}
+  .motion-status.ready{color:var(--ok)}
+  .motion-status.wrong{color:var(--danger)}
+  .motion-status.error{color:var(--danger)}
+  .info-banner{background:rgba(0,149,246,.08);border:1px solid rgba(0,149,246,.3);border-radius:8px;padding:10px;margin-bottom:12px;font-size:11px;color:var(--accent);line-height:1.5;text-align:left}
+
+  /* Profile/Settings */
+  .profile-section{padding:20px;text-align:center}
+  .profile-avatar{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--purple));margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:32px;overflow:hidden;cursor:pointer;position:relative}
+  .profile-avatar img{width:100%;height:100%;object-fit:cover}
+  .profile-avatar .change-overlay{position:absolute;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;opacity:0;transition:.15s}
+  .profile-avatar:hover .change-overlay{opacity:1}
+  .profile-name{font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px}
+  .profile-meta{font-size:12px;color:var(--text-2);margin-top:4px}
+  .menu-item{padding:14px 20px;display:flex;align-items:center;gap:12px;cursor:pointer;border-bottom:1px solid var(--border);transition:.1s}
+  .menu-item:hover{background:var(--bg-3)}
+  .menu-item svg{width:20px;height:20px;color:var(--text-2)}
+  .menu-item .mi-label{flex:1;font-size:14px}
+  .menu-item .mi-arrow{color:var(--text-3)}
+
+  /* Toast */
+  .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:var(--bg-3);border:1px solid var(--border);color:var(--text);padding:10px 16px;border-radius:10px;font-size:13px;z-index:3000;box-shadow:var(--shadow);animation:toastIn .3s ease;max-width:90%;text-align:center}
+  @keyframes toastIn{from{transform:translate(-50%,-100%);opacity:0}to{transform:translate(-50%,0);opacity:1}}
   .toast.success{border-left:3px solid var(--ok)}
   .toast.error{border-left:3px solid var(--danger)}
   .toast.info{border-left:3px solid var(--accent)}
   .toast.warn{border-left:3px solid var(--warn)}
 
-  @media (max-width:760px){
-    #chatApp.active{grid-template-columns:1fr}
-    .sidebar.hide-mobile{display:none}
-    .chat-area.hide-mobile{display:none}
-    .messages{padding:16px 12px}
+  /* Verified badge styles */
+  .verified-tick{display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;margin-left:3px}
+  .verified-tick svg{width:18px;height:18px}
+
+  @media(max-width:768px){
+    .auth-card{max-width:100%}
+    .messages{padding:12px 8px}
     .msg .bubble{max-width:80%}
-    .card{max-width:calc(100% - 24px)}
+    .ig-screen{max-width:100%}
   }
 </style>
 </head>
@@ -331,7 +235,6 @@
 <div id="authScreen">
   <div class="auth-card">
     <div class="auth-logo">IndoChat</div>
-    <div class="auth-sub">Connect securely with your community</div>
     <div id="signupForm">
       <div class="field">
         <label>Username</label>
@@ -344,7 +247,6 @@
           <span class="prefix">+91</span>
           <input type="tel" id="suMobile" class="with-prefix" placeholder="98765 43210" maxlength="10" />
         </div>
-        <div class="hint">Used for account recovery</div>
         <div class="err" id="suMobileErr"></div>
       </div>
       <div class="field">
@@ -371,13 +273,12 @@
         <input type="password" id="liPassword" placeholder="Your password" />
         <div class="err" id="liPasswordErr"></div>
       </div>
-      <div style="text-align:right;margin:-4px 0 14px">
+      <div style="text-align:right;margin:-4px 0 10px">
         <span class="btn-text" id="forgotPasswordLink">Forgot password?</span>
       </div>
       <button class="btn btn-primary" id="loginBtn">Sign In</button>
       <p class="switch-mode">New here? <a id="goToSignup">Create an account</a></p>
     </div>
-    <div class="form-footnote">By continuing you agree to follow IndoChat community guidelines.</div>
   </div>
 </div>
 
@@ -385,7 +286,7 @@
 <div id="chatApp">
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
-      <div class="me">
+      <div class="me" id="meBtn">
         <div class="avatar" id="meAvatar">U</div>
         <div class="me-info">
           <div class="name" id="meName">user</div>
@@ -393,16 +294,15 @@
         </div>
       </div>
       <div class="header-actions">
-        <button class="icon-btn" id="inboxBtn" title="Inbox">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-          <span class="badge" id="inboxBadge" style="display:none">0</span>
+        <button class="icon-btn" id="newChatBtn" title="New chat">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
         </button>
         <button class="icon-btn" id="logoutBtn" title="Sign out">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         </button>
       </div>
     </div>
-    <div class="search-bar">
+    <div class="search-bar" id="searchBar" style="display:none">
       <div class="search-wrap">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-2)"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input type="text" id="searchInput" placeholder="Search username..." autocomplete="off" />
@@ -410,31 +310,34 @@
       <div class="search-results" id="searchResults"></div>
     </div>
     <div class="chat-list" id="chatList">
-      <div class="empty-list">No conversations yet.<br/>Search a username above to start chatting.</div>
+      <div class="empty-list">No conversations yet.<br/>Tap the message icon to start chatting.</div>
     </div>
   </aside>
   <main class="chat-area" id="chatArea">
     <div class="no-chat" id="noChatView">
-      <div class="nc-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--text-2)"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
-      <h3>Your Messages</h3>
-      <p>Select a conversation from the sidebar, or search a username to start a new chat.</p>
+      <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="color:var(--text-3)"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <h3 style="font-weight:600;font-size:18px">Your Messages</h3>
+      <p style="font-size:13px;max-width:280px">Select a conversation or start a new one.</p>
     </div>
-    <div id="chatView" style="display:none;flex-direction:column;flex:1">
+    <div id="chatView" style="display:none;flex-direction:column;flex:1;overflow:hidden">
       <div class="chat-header">
-        <button class="icon-btn" id="backBtn" style="display:none">
+        <div class="back-btn" id="backBtn">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-        </button>
+        </div>
         <div class="avatar" id="peerAvatar">U</div>
         <div class="ch-info">
           <div class="name" id="peerName">user</div>
           <div class="status" id="peerStatus">online</div>
         </div>
+        <button class="icon-btn" id="reportPeerBtn" title="Report">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+        </button>
       </div>
       <div class="messages" id="messages"></div>
       <div class="composer">
-        <input type="text" id="msgInput" placeholder="Type a message..." autocomplete="off" />
+        <input type="text" id="msgInput" placeholder="Message..." autocomplete="off" />
         <button class="send-btn" id="sendBtn">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
         </button>
       </div>
     </div>
@@ -446,6 +349,9 @@
 <div class="modal" id="modalOverlay"><div class="modal-card" id="modalCard"></div></div>
 <div id="toastContainer"></div>
 
+<!-- Hidden file input for profile pic -->
+<input type="file" id="profilePicInput" accept="image/*" style="display:none" />
+
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script>
@@ -453,11 +359,13 @@ const firebaseConfig={apiKey:"AIzaSyDso-THNFZMDqPF1FSzUwmgxtZmPfgQMoA",authDomai
 firebase.initializeApp(firebaseConfig);
 const db=firebase.database();
 
-let currentUser=null,currentUserRef=null,statusListener=null,inboxListener=null;
+let currentUser=null,currentUserRef=null,statusListener=null;
 let activePeer=null,activeChatId=null,messagesListener=null,chatsListener=null;
-let chatListCache={},inboxCache={};
+let chatListCache={},myData={};
 
-function toast(msg,type='info'){const t=document.createElement('div');t.className='toast '+type;t.textContent=msg;document.getElementById('toastContainer').appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity .3s';setTimeout(()=>t.remove(),300);},3000);}
+const VERIFIED_SVG='<span class="verified-tick"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#0095f6"/><path d="M7 12.5l3.5 3.5 7-7" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+
+function toast(msg,type='info'){const t=document.createElement('div');t.className='toast '+type;t.textContent=msg;document.getElementById('toastContainer').appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity .3s';setTimeout(()=>t.remove(),300);},2800);}
 function sanitizeUsername(u){return (u||'').toLowerCase().trim().replace(/[^a-z0-9_]/g,'');}
 function sanitizeMobile(m){return (m||'').replace(/\D/g,'').slice(-10);}
 function hashPassword(pw){let h=0;for(let i=0;i<pw.length;i++){h=((h<<5)-h)+pw.charCodeAt(i);h|=0;}return 'h'+Math.abs(h).toString(36)+'_'+pw.length;}
@@ -467,40 +375,46 @@ function formatDateTime(ts){if(!ts)return '';return new Date(ts).toLocaleString(
 function formatRelative(ts){if(!ts)return '';const d=Date.now()-ts;if(d<60000)return 'just now';if(d<3600000)return Math.floor(d/60000)+'m ago';if(d<86400000)return Math.floor(d/3600000)+'h ago';return new Date(ts).toLocaleDateString();}
 function chatIdFor(a,b){return [a,b].sort().join('__');}
 function genId(p){return p+Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+// Simple message encoding (obfuscation - NOT real encryption but prevents casual DB reading)
+function encodeMsg(text){return btoa(unescape(encodeURIComponent(text)));}
+function decodeMsg(encoded){try{return decodeURIComponent(escape(atob(encoded)));}catch(e){return encoded;}}
 
+// AUTH SWITCH
 document.getElementById('goToLogin').onclick=()=>{document.getElementById('signupForm').style.display='none';document.getElementById('loginForm').style.display='block';['suUsernameErr','suMobileErr','suPasswordErr','suConfirmErr'].forEach(id=>document.getElementById(id).textContent='');};
 document.getElementById('goToSignup').onclick=()=>{document.getElementById('loginForm').style.display='none';document.getElementById('signupForm').style.display='block';['liUsernameErr','liPasswordErr'].forEach(id=>document.getElementById(id).textContent='');};
 
+// SIGNUP
 document.getElementById('signupBtn').onclick=async()=>{
   const u=sanitizeUsername(document.getElementById('suUsername').value);
   const m=sanitizeMobile(document.getElementById('suMobile').value);
   const p=document.getElementById('suPassword').value;
   const c=document.getElementById('suConfirm').value;
   ['suUsernameErr','suMobileErr','suPasswordErr','suConfirmErr'].forEach(id=>document.getElementById(id).textContent='');
-  if(u.length<3){document.getElementById('suUsernameErr').textContent='Username must be at least 3 characters';return;}
-  if(m.length!==10){document.getElementById('suMobileErr').textContent='Enter a valid 10-digit mobile number';return;}
-  if(p.length<6){document.getElementById('suPasswordErr').textContent='Password must be at least 6 characters';return;}
+  if(u.length<3){document.getElementById('suUsernameErr').textContent='At least 3 characters';return;}
+  if(m.length!==10){document.getElementById('suMobileErr').textContent='Enter 10-digit mobile';return;}
+  if(p.length<6){document.getElementById('suPasswordErr').textContent='At least 6 characters';return;}
   if(p!==c){document.getElementById('suConfirmErr').textContent='Passwords do not match';return;}
   const btn=document.getElementById('signupBtn');btn.disabled=true;btn.textContent='Creating...';
   try{
     const mobileSnap=await db.ref('mobileIndex/'+m).get();
-    if(mobileSnap.exists()){document.getElementById('suMobileErr').textContent='This mobile number is already registered';btn.disabled=false;btn.textContent='Create Account';return;}
+    if(mobileSnap.exists()){document.getElementById('suMobileErr').textContent='Mobile already registered';btn.disabled=false;btn.textContent='Create Account';return;}
     const snap=await db.ref('users/'+u).get();
-    if(snap.exists()){document.getElementById('suUsernameErr').textContent='Username already taken';btn.disabled=false;btn.textContent='Create Account';return;}
-    await db.ref('users/'+u).set({username:u,mobile:m,password:hashPassword(p),status:'active',createdAt:firebase.database.ServerValue.TIMESTAMP,chats:{},resetUsed:false,appeal:{submitted:false,captchaPassed:false,faceVerification:{left:false,right:false,up:false,down:false}}});
+    if(snap.exists()){document.getElementById('suUsernameErr').textContent='Username taken';btn.disabled=false;btn.textContent='Create Account';return;}
+    await db.ref('users/'+u).set({username:u,mobile:m,password:hashPassword(p),status:'active',verified:false,profilePic:null,createdAt:firebase.database.ServerValue.TIMESTAMP,chats:{},resetUsed:false,appeal:{submitted:false,captchaPassed:false,faceVerification:{left:false,right:false,up:false,down:false}}});
     await db.ref('mobileIndex/'+m).set(u);
     localStorage.setItem('indochat_user',u);
     enterChat(u);
   }catch(e){toast('Error: '+e.message,'error');btn.disabled=false;btn.textContent='Create Account';}
 };
 
+// LOGIN
 document.getElementById('loginBtn').onclick=async()=>{
   const u=sanitizeUsername(document.getElementById('liUsername').value);
   const p=document.getElementById('liPassword').value;
   document.getElementById('liUsernameErr').textContent='';
   document.getElementById('liPasswordErr').textContent='';
-  if(!u){document.getElementById('liUsernameErr').textContent='Enter your username';return;}
-  if(!p){document.getElementById('liPasswordErr').textContent='Enter your password';return;}
+  if(!u){document.getElementById('liUsernameErr').textContent='Enter username';return;}
+  if(!p){document.getElementById('liPasswordErr').textContent='Enter password';return;}
   const btn=document.getElementById('loginBtn');btn.disabled=true;btn.textContent='Signing in...';
   try{
     const snap=await db.ref('users/'+u).get();
@@ -515,116 +429,36 @@ document.getElementById('loginBtn').onclick=async()=>{
 ['suUsername','suPassword','suConfirm','suMobile'].forEach(id=>document.getElementById(id).addEventListener('keypress',e=>{if(e.key==='Enter')document.getElementById('signupBtn').click();}));
 ['liUsername','liPassword'].forEach(id=>document.getElementById(id).addEventListener('keypress',e=>{if(e.key==='Enter')document.getElementById('loginBtn').click();}));
 
-// ============ FORGOT PASSWORD ============
+// FORGOT PASSWORD
 document.getElementById('forgotPasswordLink').onclick=openForgotPassword;
-
 function openForgotPassword(){
-  let step=0;
-  let data={username:'',mobile:'',email:'',reason:''};
+  let step=0;let data={username:'',mobile:'',email:'',reason:''};
   const render=()=>{
     const card=document.getElementById('modalCard');
-    card.innerHTML=`
-      <div class="mc-head">
-        <div class="mc-icon info"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
-        <div><div class="mc-title">Password Recovery</div><div class="mc-subtitle">Step ${step+1} of 3</div></div>
-      </div>
-      <div class="mc-body">
-        <div class="wiz-progress">
-          <div class="wiz-num ${step>=0?'active':''} ${step>0?'done':''}">1</div>
-          <div class="wiz-line ${step>0?'done':''}"></div>
-          <div class="wiz-num ${step>0?'active':''} ${step>1?'done':''}">2</div>
-          <div class="wiz-line ${step>1?'done':''}"></div>
-          <div class="wiz-num ${step>1?'active':''} ${step>2?'done':''}">3</div>
-        </div>
-        <div class="wiz-step ${step===0?'active':''}">
-          <div class="field">
-            <label>Username</label>
-            <input type="text" id="fpUsername" placeholder="Enter your exact username" autocomplete="off" value="${escapeHtml(data.username)}" />
-            <div class="hint">The username you normally sign in with.</div>
-            <div class="err" id="fpUsernameErr"></div>
-          </div>
-        </div>
-        <div class="wiz-step ${step===1?'active':''}">
-          <div class="field">
-            <label>Mobile number registered with this account</label>
-            <div class="input-wrap" style="position:relative">
-              <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-2);font-size:14px;font-weight:500;pointer-events:none">+91</span>
-              <input type="tel" id="fpMobile" class="with-prefix" placeholder="98765 43210" maxlength="10" value="${escapeHtml(data.mobile)}" style="padding-left:42px" />
-            </div>
-            <div class="hint">Must match the mobile number you registered with.</div>
-            <div class="err" id="fpMobileErr"></div>
-          </div>
-          <div class="field">
-            <label>Email address to receive the reset link</label>
-            <input type="email" id="fpEmail" placeholder="you@example.com" value="${escapeHtml(data.email)}" />
-            <div class="hint">The team will send the one-time reset link to this email.</div>
-            <div class="err" id="fpEmailErr"></div>
-          </div>
-        </div>
-        <div class="wiz-step ${step===2?'active':''}">
-          <div class="field">
-            <label>What happened? (optional)</label>
-            <textarea id="fpReason" rows="3" placeholder="e.g. I forgot my password and cannot access my account.">${escapeHtml(data.reason)}</textarea>
-          </div>
-          <div class="meta-box">
-            <div class="meta-row"><span class="k">Username</span><span class="v">${escapeHtml(data.username||'—')}</span></div>
-            <div class="meta-row"><span class="k">Mobile</span><span class="v">+91 ${escapeHtml(data.mobile||'—')}</span></div>
-            <div class="meta-row"><span class="k">Email</span><span class="v">${escapeHtml(data.email||'—')}</span></div>
-          </div>
-          <div class="reason-box info">
-            <div class="rb-label">How it works</div>
-            <div class="rb-text">The team verifies your mobile matches the registered one, then creates a one-time reset link sent to your email. The link works once and expires in 24 hours.</div>
-          </div>
-        </div>
-      </div>
-      <div class="mc-actions">
-        ${step>0?'<button class="btn btn-ghost" id="wizBack">Back</button>':'<button class="btn btn-ghost" id="wizCancel">Cancel</button>'}
-        ${step<2?'<button class="btn btn-primary" id="wizNext">Continue</button>':'<button class="btn btn-primary" id="wizSubmit">Submit Request</button>'}
-      </div>
-    `;
+    card.innerHTML=`<div class="mc-head"><div class="mc-icon info"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><div><div class="mc-title">Password Recovery</div><div class="mc-subtitle">Step ${step+1} of 3</div></div></div><div class="mc-body"><div class="wiz-progress"><div class="wiz-num ${step>=0?'active':''} ${step>0?'done':''}">1</div><div class="wiz-line ${step>0?'done':''}"></div><div class="wiz-num ${step>0?'active':''} ${step>1?'done':''}">2</div><div class="wiz-line ${step>1?'done':''}"></div><div class="wiz-num ${step>1?'active':''} ${step>2?'done':''}">3</div></div>${step===0?`<div class="field"><label>Username</label><input type="text" id="fpUsername" placeholder="Your exact username" autocomplete="off" value="${escapeHtml(data.username)}" /><div class="hint">The username you sign in with.</div><div class="err" id="fpUsernameErr"></div></div>`:''}${step===1?`<div class="field"><label>Mobile number</label><div class="input-wrap"><span class="prefix">+91</span><input type="tel" id="fpMobile" class="with-prefix" placeholder="98765 43210" maxlength="10" value="${escapeHtml(data.mobile)}" /></div><div class="hint">Must match your registered mobile.</div><div class="err" id="fpMobileErr"></div></div><div class="field"><label>Email for reset link</label><input type="email" id="fpEmail" placeholder="you@example.com" value="${escapeHtml(data.email)}" /><div class="hint">Team sends the one-time link here.</div><div class="err" id="fpEmailErr"></div></div>`:''}${step===2?`<div class="field"><label>What happened? (optional)</label><textarea id="fpReason" rows="3" placeholder="e.g. I forgot my password">${escapeHtml(data.reason)}</textarea></div><div class="ig-reason info"><div class="lbl">How it works</div><div class="txt">Team verifies your mobile, then sends a one-time reset link to your email. Works once, expires in 24h.</div></div>`:''}</div><div class="mc-actions">${step>0?'<button class="btn btn-ghost" id="wizBack">Back</button>':'<button class="btn btn-ghost" id="wizCancel">Cancel</button>'}${step<2?'<button class="btn btn-primary" id="wizNext">Continue</button>':'<button class="btn btn-primary" id="wizSubmit">Submit</button>'}</div>`;
     document.getElementById('modalOverlay').classList.add('active');
     const c=document.getElementById('wizCancel');if(c)c.onclick=closeModal;
-    const b=document.getElementById('wizBack');
-    if(b)b.onclick=()=>{
-      if(step===2){data.reason=document.getElementById('fpReason').value.trim();}
-      if(step===1){data.mobile=sanitizeMobile(document.getElementById('fpMobile').value);data.email=document.getElementById('fpEmail').value.trim();}
-      step--;render();
-    };
+    const b=document.getElementById('wizBack');if(b)b.onclick=()=>{if(step===2)data.reason=document.getElementById('fpReason').value.trim();if(step===1){data.mobile=sanitizeMobile(document.getElementById('fpMobile').value);data.email=document.getElementById('fpEmail').value.trim();}step--;render();};
     const n=document.getElementById('wizNext');
     if(n)n.onclick=async()=>{
       if(step===0){
-        const rawUsername=document.getElementById('fpUsername').value;
-        data.username=sanitizeUsername(rawUsername);
-        const errEl=document.getElementById('fpUsernameErr');
-        errEl.textContent='';
-        if(!rawUsername.trim()){errEl.textContent='Please enter a username';return;}
-        if(data.username.length<3){errEl.textContent='Username must be at least 3 characters';return;}
+        data.username=sanitizeUsername(document.getElementById('fpUsername').value);
+        const e=document.getElementById('fpUsernameErr');e.textContent='';
+        if(data.username.length<3){e.textContent='At least 3 characters';return;}
         n.disabled=true;n.textContent='Checking...';
         try{
           const snap=await db.ref('users/'+data.username).get();
-          if(!snap.exists()){errEl.textContent='No account found with username "'+data.username+'". Make sure you typed it correctly.';n.disabled=false;n.textContent='Continue';return;}
-          const ud=snap.val();
-          if(ud.resetUsed===true){errEl.textContent='A password reset has already been used for this account. No more resets allowed.';n.disabled=false;n.textContent='Continue';return;}
-          const pendingSnap=await db.ref('teamRequests').get();
-          let hasPending=false;
-          if(pendingSnap.exists()){
-            pendingSnap.forEach(c=>{const r=c.val();if(r.username===data.username&&r.type==='forgot_password'&&r.status==='pending')hasPending=true;});
-          }
-          if(hasPending){errEl.textContent='You already have a pending reset request. The team is reviewing it.';n.disabled=false;n.textContent='Continue';return;}
+          if(!snap.exists()){e.textContent='No account with this username';n.disabled=false;n.textContent='Continue';return;}
+          if(snap.val().resetUsed===true){e.textContent='Reset already used for this account';n.disabled=false;n.textContent='Continue';return;}
           step=1;render();
-        }catch(e){
-          errEl.textContent='Error: '+e.message;
-          n.disabled=false;n.textContent='Continue';
-        }
+        }catch(err){e.textContent='Error: '+err.message;n.disabled=false;n.textContent='Continue';}
       }else if(step===1){
         data.mobile=sanitizeMobile(document.getElementById('fpMobile').value);
         data.email=document.getElementById('fpEmail').value.trim();
-        const mobileErr=document.getElementById('fpMobileErr');
-        const emailErr=document.getElementById('fpEmailErr');
-        mobileErr.textContent='';
-        emailErr.textContent='';
-        if(data.mobile.length!==10){mobileErr.textContent='Enter a valid 10-digit mobile number';return;}
-        if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)){emailErr.textContent='Enter a valid email address';return;}
+        const me=document.getElementById('fpMobileErr'),ee=document.getElementById('fpEmailErr');
+        me.textContent='';ee.textContent='';
+        if(data.mobile.length!==10){me.textContent='Enter 10-digit mobile';return;}
+        if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)){ee.textContent='Enter valid email';return;}
         step=2;render();
       }
     };
@@ -635,46 +469,19 @@ function openForgotPassword(){
       try{
         const reqId=genId('fp_');
         await db.ref('teamRequests/'+reqId).set({type:'forgot_password',username:data.username,mobileEntered:data.mobile,email:data.email,reason:data.reason,status:'pending',createdAt:firebase.database.ServerValue.TIMESTAMP});
-        showForgotConfirmation(data,reqId);
-      }catch(e){toast('Error: '+e.message,'error');s.disabled=false;s.textContent='Submit Request';}
+        showForgotConfirm(data,reqId);
+      }catch(e){toast('Error: '+e.message,'error');s.disabled=false;s.textContent='Submit';}
     };
   };
   render();
 }
-
-function showForgotConfirmation(data,reqId){
+function showForgotConfirm(data,reqId){
   const card=document.getElementById('modalCard');
-  card.innerHTML=`
-    <div class="mc-head">
-      <div class="mc-icon ok"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div>
-      <div><div class="mc-title">Request Submitted</div><div class="mc-subtitle">Your password recovery request has been received</div></div>
-    </div>
-    <div class="mc-body">
-      <div class="meta-box">
-        <div class="meta-row"><span class="k">Request ID</span><span class="v mono">${escapeHtml(reqId)}</span></div>
-        <div class="meta-row"><span class="k">Username</span><span class="v">${escapeHtml(data.username)}</span></div>
-        <div class="meta-row"><span class="k">Mobile</span><span class="v">+91 ${escapeHtml(data.mobile)}</span></div>
-        <div class="meta-row"><span class="k">Email</span><span class="v">${escapeHtml(data.email)}</span></div>
-        <div class="meta-row"><span class="k">Status</span><span class="v" style="color:var(--warn)">Pending Review</span></div>
-      </div>
-      <div class="reason-box info">
-        <div class="rb-label">What happens next</div>
-        <div class="rb-text">
-          1. The IndoChat team reviews your request.<br/>
-          2. They verify your mobile number matches the registered one.<br/>
-          3. If verified, a one-time reset link is sent to your email.<br/>
-          4. Open the link and set a new password.<br/>
-          5. The link works once and expires in 24 hours.
-        </div>
-      </div>
-    </div>
-    <div class="mc-actions">
-      <button class="btn btn-primary" id="fpDone">Done</button>
-    </div>
-  `;
+  card.innerHTML=`<div class="mc-head"><div class="mc-icon ok"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div><div><div class="mc-title">Request Submitted</div><div class="mc-subtitle">Your request has been received</div></div></div><div class="mc-body"><div class="ig-reason info"><div class="lbl">Details</div><div class="txt">Username: ${escapeHtml(data.username)}<br/>Mobile: +91 ${escapeHtml(data.mobile)}<br/>Email: ${escapeHtml(data.email)}</div></div><div class="ig-reason ok"><div class="lbl">Next Steps</div><div class="txt">1. Team reviews your request<br/>2. Verifies your mobile matches<br/>3. Sends one-time reset link to your email<br/>4. Open link, set new password<br/>5. Link expires in 24h, works once</div></div></div><div class="mc-actions"><button class="btn btn-primary" id="fpDone">Done</button></div>`;
   document.getElementById('fpDone').onclick=closeModal;
 }
 
+// MODAL HELPERS
 function openModal({icon,iconClass,title,subtitle,bodyHtml,actions}){
   const card=document.getElementById('modalCard');
   card.innerHTML=`<div class="mc-head"><div class="mc-icon ${iconClass||'info'}">${icon||''}</div><div><div class="mc-title">${title||''}</div>${subtitle?`<div class="mc-subtitle">${subtitle}</div>`:''}</div></div><div class="mc-body">${bodyHtml||''}</div><div class="mc-actions">${(actions||[]).map(a=>`<button class="btn ${a.class}">${a.label}</button>`).join('')}</div>`;
@@ -684,20 +491,29 @@ function openModal({icon,iconClass,title,subtitle,bodyHtml,actions}){
 function closeModal(){document.getElementById('modalOverlay').classList.remove('active');}
 document.getElementById('modalOverlay').addEventListener('click',e=>{if(e.target.id==='modalOverlay')closeModal();});
 
+// ENTER CHAT
 async function enterChat(username){
   currentUser=username;
   currentUserRef=db.ref('users/'+username);
   document.getElementById('authScreen').style.display='none';
   document.getElementById('chatApp').classList.add('active');
-  document.getElementById('meName').textContent=username;
-  document.getElementById('meAvatar').textContent=username.charAt(0).toUpperCase();
   await currentUserRef.child('online').set(true);
   await currentUserRef.child('lastSeen').set(firebase.database.ServerValue.TIMESTAMP);
   window.addEventListener('beforeunload',()=>{currentUserRef.child('online').set(false);currentUserRef.child('lastSeen').set(firebase.database.ServerValue.TIMESTAMP);});
   listenToStatus();
+  listenToMyData();
   loadChatList();
-  loadInbox();
-  toast('Welcome back, '+username,'success');
+  toast('Welcome back','success');
+}
+
+function listenToMyData(){
+  currentUserRef.on('value',snap=>{
+    myData=snap.val()||{};
+    document.getElementById('meName').innerHTML=escapeHtml(currentUser)+(myData.verified?VERIFIED_SVG:'');
+    const av=document.getElementById('meAvatar');
+    if(myData.profilePic){av.innerHTML='<img src="'+myData.profilePic+'" alt=""/>';}
+    else{av.textContent=currentUser.charAt(0).toUpperCase();}
+  });
 }
 
 function listenToStatus(){
@@ -714,6 +530,12 @@ function listenToStatus(){
 }
 function closeMainOverlay(){document.getElementById('mainOverlay').classList.remove('active');}
 
+// NEW CHAT / SEARCH
+document.getElementById('newChatBtn').onclick=()=>{
+  const sb=document.getElementById('searchBar');
+  sb.style.display=sb.style.display==='none'?'block':'none';
+  if(sb.style.display==='block')document.getElementById('searchInput').focus();
+};
 const searchInput=document.getElementById('searchInput');
 const searchResults=document.getElementById('searchResults');
 let searchDebounce=null;
@@ -726,9 +548,9 @@ searchInput.addEventListener('input',()=>{
 async function doSearch(q){
   const snap=await db.ref('users').orderByKey().limitToFirst(50).get();
   const results=[];
-  snap.forEach(child=>{const u=child.key;const d=child.val();if(u!==currentUser&&u.startsWith(q)&&d.status!=='disabled')results.push({username:u});});
+  snap.forEach(child=>{const u=child.key;const d=child.val();if(u!==currentUser&&u.startsWith(q)&&d.status!=='disabled')results.push({username:u,verified:d.verified||false});});
   if(results.length===0){searchResults.innerHTML='<div style="padding:14px;text-align:center;color:var(--text-2);font-size:12px">No users found</div>';}
-  else{searchResults.innerHTML=results.map(r=>`<div class="search-result-item" data-username="${escapeHtml(r.username)}"><div class="sr-avatar">${r.username.charAt(0).toUpperCase()}</div><div class="sr-name">${escapeHtml(r.username)}</div><div class="sr-add">Add</div></div>`).join('');searchResults.querySelectorAll('.search-result-item').forEach(el=>{el.onclick=async()=>{const u=el.getAttribute('data-username');await addChat(u);searchInput.value='';searchResults.classList.remove('active');searchResults.innerHTML='';};});}
+  else{searchResults.innerHTML=results.map(r=>`<div class="search-result-item" data-username="${escapeHtml(r.username)}"><div class="sr-name">${escapeHtml(r.username)}${r.verified?VERIFIED_SVG:''}</div><div class="sr-add">Add</div></div>`).join('');searchResults.querySelectorAll('.search-result-item').forEach(el=>{el.onclick=async()=>{const u=el.getAttribute('data-username');await addChat(u);searchInput.value='';searchResults.classList.remove('active');document.getElementById('searchBar').style.display='none';};});}
   searchResults.classList.add('active');
 }
 document.addEventListener('click',e=>{if(!e.target.closest('.search-bar'))searchResults.classList.remove('active');});
@@ -737,7 +559,6 @@ async function addChat(peer){
   const cid=chatIdFor(currentUser,peer);
   await db.ref('users/'+currentUser+'/chats/'+peer).set({cid,peer:peer,lastSeen:firebase.database.ServerValue.TIMESTAMP});
   await db.ref('users/'+peer+'/chats/'+currentUser).set({cid,peer:currentUser,lastSeen:firebase.database.ServerValue.TIMESTAMP});
-  toast('Added '+peer,'success');
   loadChatList();
   openChat(peer);
 }
@@ -750,12 +571,12 @@ function loadChatList(){
 function renderChatList(){
   const list=document.getElementById('chatList');
   const entries=Object.values(chatListCache);
-  if(entries.length===0){list.innerHTML='<div class="empty-list">No conversations yet.<br/>Search a username above to start chatting.</div>';return;}
-  list.innerHTML=entries.map(e=>`<div class="chat-list-item" data-peer="${escapeHtml(e.peer)}"><div class="avatar">${e.peer.charAt(0).toUpperCase()}</div><div class="cl-info"><div class="cl-name">${escapeHtml(e.peer)}</div><div class="cl-last" data-last-for="${escapeHtml(e.peer)}">Tap to open</div></div></div>`).join('');
+  if(entries.length===0){list.innerHTML='<div class="empty-list">No conversations yet.<br/>Tap the message icon to start chatting.</div>';return;}
+  list.innerHTML=entries.map(e=>`<div class="chat-list-item" data-peer="${escapeHtml(e.peer)}"><div class="avatar">${escapeHtml(e.peer.charAt(0).toUpperCase())}</div><div class="cl-info"><div class="cl-name">${escapeHtml(e.peer)}</div><div class="cl-last" data-last-for="${escapeHtml(e.peer)}">Tap to open</div></div></div>`).join('');
   entries.forEach(async e=>{
     const msgSnap=await db.ref('chats/'+e.cid+'/messages').orderByKey().limitToLast(1).get();
     let lastText='Tap to open';
-    msgSnap.forEach(c=>{lastText=c.val().text||'Attachment';});
+    msgSnap.forEach(c=>{const m=c.val();lastText=decodeMsg(m.text||'');});
     const el=list.querySelector(`[data-last-for="${e.peer}"]`);
     if(el)el.textContent=lastText;
   });
@@ -767,9 +588,14 @@ async function openChat(peer){
   activeChatId=chatIdFor(currentUser,peer);
   document.getElementById('noChatView').style.display='none';
   document.getElementById('chatView').style.display='flex';
-  document.getElementById('peerName').textContent=peer;
-  document.getElementById('peerAvatar').textContent=peer.charAt(0).toUpperCase();
-  if(window.innerWidth<=760){document.getElementById('sidebar').classList.add('hide-mobile');document.getElementById('chatArea').classList.remove('hide-mobile');document.getElementById('backBtn').style.display='flex';}
+  // Get peer data for verified badge
+  const peerSnap=await db.ref('users/'+peer).get();
+  const peerData=peerSnap.val()||{};
+  document.getElementById('peerName').innerHTML=escapeHtml(peer)+(peerData.verified?VERIFIED_SVG:'');
+  const pa=document.getElementById('peerAvatar');
+  if(peerData.profilePic){pa.innerHTML='<img src="'+peerData.profilePic+'" alt=""/>';}
+  else{pa.textContent=peer.charAt(0).toUpperCase();}
+  if(window.innerWidth<=768){document.getElementById('sidebar').classList.add('hide-mobile');document.getElementById('chatArea').classList.remove('hide-mobile');}
   db.ref('users/'+peer+'/online').on('value',s=>{const online=s.val();const st=document.getElementById('peerStatus');st.textContent=online?'online':'offline';st.style.color=online?'var(--ok)':'var(--text-2)';});
   if(messagesListener)messagesListener.off();
   const msgsEl=document.getElementById('messages');
@@ -781,10 +607,10 @@ async function openChat(peer){
     snap.forEach(child=>{
       const m=child.val();
       const day=new Date(m.timestamp||Date.now()).toDateString();
-      if(day!==lastDay){const dw=document.createElement('div');dw.className='day-wrap';const dayEl=document.createElement('div');dayEl.className='msg-day';dayEl.textContent=day===new Date().toDateString()?'Today':day;dw.appendChild(dayEl);msgsEl.appendChild(dw);lastDay=day;}
+      if(day!==lastDay){const dw=document.createElement('div');dw.className='day-wrap';const de=document.createElement('div');de.className='msg-day';de.textContent=day===new Date().toDateString()?'Today':day;dw.appendChild(de);msgsEl.appendChild(dw);lastDay=day;}
       const wrap=document.createElement('div');
       wrap.className='msg '+(m.sender===currentUser?'sent':'received');
-      wrap.innerHTML=`<div class="bubble">${escapeHtml(m.text)}<div class="meta">${formatTime(m.timestamp)}</div></div>`;
+      wrap.innerHTML=`<div class="bubble">${escapeHtml(decodeMsg(m.text))}<div class="meta">${formatTime(m.timestamp)}</div></div>`;
       msgsEl.appendChild(wrap);
     });
     msgsEl.scrollTop=msgsEl.scrollHeight;
@@ -796,91 +622,469 @@ async function sendMessage(){
   const text=document.getElementById('msgInput').value.trim();
   if(!text||!activePeer)return;
   const mySnap=await currentUserRef.child('status').get();
-  if(mySnap.val()!=='active'){toast('You cannot send messages while your account is not active.','error');return;}
-  await db.ref('chats/'+activeChatId+'/messages').push({sender:currentUser,text:text,timestamp:firebase.database.ServerValue.TIMESTAMP});
+  if(mySnap.val()!=='active'){toast('Account not active','error');return;}
+  await db.ref('chats/'+activeChatId+'/messages').push({sender:currentUser,text:encodeMsg(text),timestamp:firebase.database.ServerValue.TIMESTAMP});
   document.getElementById('msgInput').value='';
   document.getElementById('msgInput').focus();
 }
 document.getElementById('sendBtn').onclick=sendMessage;
-document.getElementById('msgInput').addEventListener('keypress',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}});
+document.getElementById('msgInput').addEventListener('keypress',e=>{if(e.key==='Enter'){e.preventDefault();sendMessage();}});
 document.getElementById('backBtn').onclick=()=>{document.getElementById('sidebar').classList.remove('hide-mobile');document.getElementById('chatArea').classList.add('hide-mobile');};
 
+// LOGOUT
 document.getElementById('logoutBtn').onclick=async()=>{
-  if(confirm('Sign out of IndoChat?')){
+  if(confirm('Sign out?')){
     if(currentUserRef){await currentUserRef.child('online').set(false);await currentUserRef.child('lastSeen').set(firebase.database.ServerValue.TIMESTAMP);}
     if(statusListener)statusListener.off();
     if(chatsListener)chatsListener.off();
     if(messagesListener)messagesListener.off();
-    if(inboxListener)inboxListener.off();
     localStorage.removeItem('indochat_user');
     location.reload();
   }
 };
 
-function loadInbox(){
-  if(inboxListener)inboxListener.off();
-  inboxListener=db.ref('userInbox/'+currentUser);
-  inboxListener.on('value',snap=>{inboxCache=snap.val()||{};renderInboxBadge();});
-}
-function renderInboxBadge(){
-  const unread=Object.values(inboxCache).filter(m=>!m.read).length;
-  const badge=document.getElementById('inboxBadge');
-  if(unread>0){badge.textContent=unread>9?'9+':unread;badge.style.display='flex';}
-  else badge.style.display='none';
-}
-document.getElementById('inboxBtn').onclick=()=>{
-  const msgs=Object.entries(inboxCache).sort((a,b)=>(b[1].createdAt||0)-(a[1].createdAt||0));
-  if(msgs.length===0){
-    openModal({icon:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>',iconClass:'info',title:'Your Inbox',subtitle:'Messages from the IndoChat team appear here',bodyHtml:'<div style="text-align:center;color:var(--text-2);padding:20px;font-size:13px">No messages yet.</div>',actions:[{label:'Close',class:'btn-ghost',onClick:closeModal}]});
-    return;
+// PROFILE / SETTINGS
+document.getElementById('meBtn').onclick=openProfile;
+
+function openProfile(){
+  const isVerified=myData.verified||false;
+  openModal({
+    icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+    iconClass:'info',title:'Profile & Settings',subtitle:isVerified?'Verified account':'Regular account',
+    bodyHtml:`
+      <div style="text-align:center;padding:10px 0 20px">
+        <div class="profile-avatar" id="profAvatar">${myData.profilePic?'<img src="'+myData.profilePic+'" alt=""/>' :escapeHtml(currentUser.charAt(0).toUpperCase())}<div class="change-overlay">Change</div></div>
+        <div class="profile-name">${escapeHtml(currentUser)}${isVerified?VERIFIED_SVG:''}</div>
+        <div class="profile-meta">+91 ${escapeHtml(myData.mobile||'')}</div>
+      </div>
+      <div class="menu-item" id="changePicBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        <div class="mi-label">Change Profile Picture</div>
+        <div class="mi-arrow">›</div>
+      </div>
+      ${isVerified?`
+      <div class="menu-item" id="changeUsernameBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        <div class="mi-label">Change Username</div>
+        <div class="mi-arrow">›</div>
+      </div>
+      <div class="menu-item" id="liveReportBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        <div class="mi-label">Open Live Report Case</div>
+        <div class="mi-arrow">›</div>
+      </div>
+      <div class="menu-item" id="myCasesBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-4"/><polyline points="9 11 12 14 15 11"/></svg>
+        <div class="mi-label">My Report Cases</div>
+        <div class="mi-arrow">›</div>
+      </div>
+      `:`
+      <div class="menu-item" id="verifyBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c2.39 0 4.55.94 6.13 2.45"/></svg>
+        <div class="mi-label">Get Verified</div>
+        <div class="mi-arrow">›</div>
+      </div>
+      `}
+    `,
+    actions:[{label:'Close',class:'btn-ghost',onClick:closeModal}]
+  });
+  document.getElementById('changePicBtn').onclick=()=>{closeModal();document.getElementById('profilePicInput').click();};
+  if(isVerified){
+    const cub=document.getElementById('changeUsernameBtn');if(cub)cub.onclick=()=>{closeModal();openChangeUsername();};
+    const lrb=document.getElementById('liveReportBtn');if(lrb)lrb.onclick=()=>{closeModal();openLiveReport();};
+    const mcb=document.getElementById('myCasesBtn');if(mcb)mcb.onclick=()=>{closeModal();openMyCases();};
+  }else{
+    const vb=document.getElementById('verifyBtn');if(vb)vb.onclick=()=>{closeModal();openVerification();};
   }
-  const html=msgs.map(([id,m])=>`<div class="inbox-item ${m.read?'':'unread'}" data-id="${id}"><div class="ii-head"><div class="ii-title">${escapeHtml(m.title||'Message')}</div><div class="ii-time">${formatRelative(m.createdAt)}</div></div><div class="ii-preview">${escapeHtml((m.body||'').slice(0,120))}${(m.body||'').length>120?'...':''}</div></div>`).join('');
-  openModal({icon:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>',iconClass:'info',title:'Your Inbox',subtitle:`${msgs.filter(([,m])=>!m.read).length} unread`,bodyHtml:`<div class="inbox-list">${html}</div>`,actions:[{label:'Close',class:'btn-ghost',onClick:closeModal}]});
-  document.querySelectorAll('.inbox-item').forEach(el=>{
-    el.onclick=async()=>{
-      const id=el.getAttribute('data-id');
-      const m=inboxCache[id];
-      if(!m)return;
-      if(!m.read)await db.ref('userInbox/'+currentUser+'/'+id+'/read').set(true);
-      let actions=[{label:'Close',class:'btn-ghost',onClick:closeModal}];
-      let body=`<div style="font-size:13px;line-height:1.7">${escapeHtml(m.body||'')}</div><div class="meta-box" style="margin-top:14px"><div class="meta-row"><span class="k">Received</span><span class="v">${formatDateTime(m.createdAt)}</span></div></div>`;
-      if(m.type==='reset_link'&&m.resetToken){
-        body+=`<div class="reason-box ok" style="margin-top:14px"><div class="rb-label">Password Reset Link</div><div class="rb-text">${escapeHtml(m.resetUrl||'Click below to reset your password.')}</div></div>`;
-        actions=[{label:'Close',class:'btn-ghost',onClick:closeModal},{label:'Reset Password',class:'btn-primary',onClick:()=>{closeModal();openResetPassword(m.resetToken);}}];
+}
+
+// PROFILE PIC UPLOAD
+document.getElementById('profilePicInput').onchange=async(e)=>{
+  const file=e.target.files[0];
+  if(!file)return;
+  if(file.size>2000000){toast('Image too large (max 2MB)','error');return;}
+  const reader=new FileReader();
+  reader.onload=()=>{openCropModal(reader.result);};
+  reader.readAsDataURL(file);
+  e.target.value='';
+};
+
+function openCropModal(imgSrc){
+  const card=document.getElementById('modalCard');
+  card.innerHTML=`<div class="mc-head"><div class="mc-icon info"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div><div><div class="mc-title">Crop Profile Picture</div><div class="mc-subtitle">Drag to position</div></div></div><div class="mc-body" style="text-align:center"><div style="position:relative;width:240px;height:240px;margin:0 auto;overflow:hidden;border-radius:50%;background:#000" id="cropContainer"><img id="cropImg" src="${imgSrc}" style="max-width:none;position:absolute;cursor:move" /></div><input type="range" id="cropZoom" min="50" max="200" value="100" style="width:100%;margin-top:16px" /></div><div class="mc-actions"><button class="btn btn-ghost" id="cropCancel">Cancel</button><button class="btn btn-primary" id="cropSave">Save</button></div>`;
+  document.getElementById('modalOverlay').classList.add('active');
+  const img=document.getElementById('cropImg');
+  const container=document.getElementById('cropContainer');
+  let scale=1;
+  let posX=0,posY=0;
+  let isDragging=false,dragStartX=0,dragStartY=0;
+  img.onload=()=>{
+    const ratio=Math.max(container.offsetWidth/img.offsetWidth,container.offsetHeight/img.offsetHeight);
+    scale=ratio;
+    img.style.width=(img.offsetWidth*scale)+'px';
+    img.style.height=(img.offsetHeight*scale)+'px';
+    posX=(container.offsetWidth-img.offsetWidth*scale)/2;
+    posY=(container.offsetHeight-img.offsetHeight*scale)/2;
+    img.style.left=posX+'px';
+    img.style.top=posY+'px';
+  };
+  img.addEventListener('mousedown',e=>{isDragging=true;dragStartX=e.clientX-posX;dragStartY=e.clientY-posY;e.preventDefault();});
+  document.addEventListener('mousemove',e=>{if(!isDragging)return;posX=e.clientX-dragStartX;posY=e.clientY-dragStartY;img.style.left=posX+'px';img.style.top=posY+'px';});
+  document.addEventListener('mouseup',()=>{isDragging=false;});
+  img.addEventListener('touchstart',e=>{isDragging=true;const t=e.touches[0];dragStartX=t.clientX-posX;dragStartY=t.clientY-posY;e.preventDefault();});
+  document.addEventListener('touchmove',e=>{if(!isDragging)return;const t=e.touches[0];posX=t.clientX-dragStartX;posY=t.clientY-dragStartY;img.style.left=posX+'px';img.style.top=posY+'px';e.preventDefault();});
+  document.addEventListener('touchend',()=>{isDragging=false;});
+  document.getElementById('cropZoom').oninput=function(){
+    const newScale=parseFloat(this.value)/100*scale;
+    img.style.width=(img.offsetWidth*scale*parseFloat(this.value)/100)+'px';
+  };
+  document.getElementById('cropCancel').onclick=closeModal;
+  document.getElementById('cropSave').onclick=async()=>{
+    const canvas=document.createElement('canvas');
+    canvas.width=256;canvas.height=256;
+    const ctx=canvas.getContext('2d');
+    const imgEl=document.getElementById('cropImg');
+    const cw=container.offsetWidth,ch=container.offsetHeight;
+    const sx=(-parseFloat(imgEl.style.left||0))*(imgEl.naturalWidth/parseFloat(imgEl.style.width||imgEl.naturalWidth));
+    const sy=(-parseFloat(imgEl.style.top||0))*(imgEl.naturalHeight/parseFloat(imgEl.style.height||imgEl.naturalHeight));
+    const sw=cw*(imgEl.naturalWidth/parseFloat(imgEl.style.width||imgEl.naturalWidth));
+    const sh=ch*(imgEl.naturalHeight/parseFloat(imgEl.style.height||imgEl.naturalHeight));
+    ctx.drawImage(imgEl,sx,sy,sw,sh,0,0,256,256);
+    const dataUrl=canvas.toDataURL('image/jpeg',0.8);
+    await currentUserRef.child('profilePic').set(dataUrl);
+    closeModal();
+    toast('Profile picture updated','success');
+  };
+}
+
+// CHANGE USERNAME (verified only)
+function openChangeUsername(){
+  openModal({
+    icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>',
+    iconClass:'info',title:'Change Username',subtitle:'Verified accounts only',
+    bodyHtml:`<div class="field"><label>New username</label><input type="text" id="newUsername" placeholder="Enter new username" autocomplete="off" /><div class="err" id="newUsernameErr"></div></div>`,
+    actions:[{label:'Cancel',class:'btn-ghost',onClick:closeModal},{label:'Change',class:'btn-primary',onClick:async()=>{
+      const nu=sanitizeUsername(document.getElementById('newUsername').value);
+      const e=document.getElementById('newUsernameErr');e.textContent='';
+      if(nu.length<3){e.textContent='At least 3 characters';return;}
+      if(nu===currentUser){e.textContent='Same as current username';return;}
+      const snap=await db.ref('users/'+nu).get();
+      if(snap.exists()){e.textContent='Username already taken';return;}
+      // Create new user node with same data
+      const oldData=(await db.ref('users/'+currentUser).get()).val();
+      const newData={...oldData,username:nu};
+      await db.ref('users/'+nu).set(newData);
+      await db.ref('mobileIndex/'+oldData.mobile).set(nu);
+      // Update chat references
+      if(oldData.chats){
+        for(const peer of Object.keys(oldData.chats)){
+          const cid=chatIdFor(currentUser,peer);
+          const newCid=chatIdFor(nu,peer);
+          const chatSnap=await db.ref('chats/'+cid).get();
+          if(chatSnap.exists()){
+            await db.ref('chats/'+newCid).set(chatSnap.val());
+            await db.ref('chats/'+cid).remove();
+          }
+          await db.ref('users/'+peer+'/chats/'+nu).set({cid:newCid,peer:nu,...(oldData.chats[peer]||{})});
+          await db.ref('users/'+peer+'/chats/'+currentUser).remove();
+        }
       }
-      if(m.type==='recovery_approved'){
-        body+=`<div class="reason-box ok" style="margin-top:14px"><div class="rb-label">Account Recovered</div><div class="rb-text">Your account has been reinstated.</div></div>`;
-        actions=[{label:'Close',class:'btn-ghost',onClick:closeModal},{label:'Continue',class:'btn-ok',onClick:async()=>{await currentUserRef.child('status').set('active');await currentUserRef.child('disableInfo').remove();await currentUserRef.child('recoveryRequest').remove();closeModal();closeMainOverlay();toast('Welcome back!','success');}}];
+      await db.ref('users/'+currentUser).remove();
+      localStorage.setItem('indochat_user',nu);
+      closeModal();
+      toast('Username changed. Please sign in again.','success');
+      setTimeout(()=>location.reload(),1500);
+    }}]
+  });
+}
+
+// VERIFICATION REQUEST
+function openVerification(){
+  openModal({
+    icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c2.39 0 4.55.94 6.13 2.45"/></svg>',
+    iconClass:'info',title:'Get Verified',subtitle:'For celebrities, brands, and companies',
+    bodyHtml:`
+      <div class="ig-reason info" style="margin-bottom:14px">
+        <div class="lbl">About Verification</div>
+        <div class="txt">Verified accounts get a blue tick next to their username, visible to everyone. Verified users can change their username, add profile pics, and open live report cases.</div>
+      </div>
+      <div class="field">
+        <label>Category</label>
+        <select id="verCategory" style="width:100%;padding:12px;background:var(--bg-3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;outline:none">
+          <option value="">Select category...</option>
+          <option value="Celebrity">Celebrity / Public Figure</option>
+          <option value="Brand">Brand / Company</option>
+          <option value="Influencer">Influencer / Creator</option>
+          <option value="Business">Business</option>
+          <option value="News">News / Media</option>
+          <option value="Music">Music / Artist</option>
+          <option value="Sports">Sports</option>
+          <option value="Other">Other</option>
+        </select>
+        <div class="err" id="verCategoryErr"></div>
+      </div>
+      <div class="field">
+        <label>Full name (as on official documents)</label>
+        <input type="text" id="verFullName" placeholder="Your full legal name" />
+        <div class="err" id="verFullNameErr"></div>
+      </div>
+      <div class="field">
+        <label>Why should you be verified?</label>
+        <textarea id="verReason" rows="3" placeholder="Describe your work, achievements, or why you need verification"></textarea>
+        <div class="err" id="verReasonErr"></div>
+      </div>
+      <div class="field">
+        <label>Proof links (website, social media, news articles)</label>
+        <textarea id="verProof" rows="2" placeholder="https://your-website.com&#10;https://instagram.com/youraccount"></textarea>
+        <div class="hint">One link per line</div>
+      </div>
+    `,
+    actions:[{label:'Cancel',class:'btn-ghost',onClick:closeModal},{label:'Submit Request',class:'btn-primary',onClick:async()=>{
+      const cat=document.getElementById('verCategory').value;
+      const name=document.getElementById('verFullName').value.trim();
+      const reason=document.getElementById('verReason').value.trim();
+      const proof=document.getElementById('verProof').value.trim();
+      document.getElementById('verCategoryErr').textContent='';
+      document.getElementById('verFullNameErr').textContent='';
+      document.getElementById('verReasonErr').textContent='';
+      if(!cat){document.getElementById('verCategoryErr').textContent='Select a category';return;}
+      if(name.length<3){document.getElementById('verFullNameErr').textContent='Enter your full name';return;}
+      if(reason.length<20){document.getElementById('verReasonErr').textContent='Please write at least 20 characters';return;}
+      // Check for pending verification request
+      const reqSnap=await db.ref('teamRequests').get();
+      let hasPending=false;
+      if(reqSnap.exists()){
+        reqSnap.forEach(c=>{const r=c.val();if(r.type==='verification'&&r.username===currentUser&&r.status==='pending')hasPending=true;});
       }
-      openModal({icon:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',iconClass:m.type==='recovery_approved'?'ok':m.type==='recovery_denied'?'danger':'info',title:m.title||'Message',subtitle:formatRelative(m.createdAt),bodyHtml:body,actions:actions});
-    };
+      if(hasPending){document.getElementById('verReasonErr').textContent='You already have a pending verification request. Wait for it to be reviewed.';return;}
+      const reqId=genId('ver_');
+      await db.ref('teamRequests/'+reqId).set({type:'verification',username:currentUser,category:cat,fullName:name,reason:reason,proof:proof,status:'pending',createdAt:firebase.database.ServerValue.TIMESTAMP});
+      closeModal();
+      toast('Verification request submitted','success');
+    }}]
+  });
+}
+
+// MY CASES (verified users see their live report status)
+async function openMyCases(){
+  const snap=await db.ref('teamRequests').get();
+  const cases=[];
+  if(snap.exists()){
+    snap.forEach(c=>{
+      const r=c.val();
+      if((r.type==='live_report'||r.type==='user_report')&&r.reporter===currentUser){
+        cases.push({id:c.key,...r});
+      }
+    });
+  }
+  cases.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  let html='';
+  if(cases.length===0){
+    html='<div style="text-align:center;color:var(--text-2);padding:30px;font-size:13px">No report cases yet.</div>';
+  }else{
+    html='<div style="display:flex;flex-direction:column;gap:10px">'+cases.map(c=>{
+      const statusColor=c.status==='pending'?'var(--warn)':c.status==='approved'?'var(--ok)':'var(--danger)';
+      const statusText=c.status==='pending'?'Under Review':c.status==='approved'?'Resolved':'Dismissed';
+      const actionText=c.resolutionNote?('Action: '+escapeHtml(c.resolutionNote)):'No action yet';
+      return '<div style="background:var(--bg-3);border:1px solid var(--border);border-radius:10px;padding:12px"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-weight:600;font-size:13px">'+escapeHtml(c.reportType||c.reason||'Report')+'</span><span style="font-size:10px;color:'+statusColor+';font-weight:600;text-transform:uppercase">'+statusText+'</span></div><div style="font-size:11px;color:var(--text-2);margin-bottom:4px">'+escapeHtml((c.details||c.reason||'').slice(0,80))+'</div><div style="font-size:11px;color:var(--text-3)">'+actionText+'</div>'+(c.reportedUser?'<div style="font-size:11px;color:var(--text-3);margin-top:2px">Against: '+escapeHtml(c.reportedUser)+'</div>':'')+'</div>';
+    }).join('')+'</div>';
+  }
+  openModal({
+    icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-4"/><polyline points="9 11 12 14 15 11"/></svg>',
+    iconClass:'info',title:'My Report Cases',subtitle:cases.length+' case(s)',
+    bodyHtml:html,
+    actions:[{label:'Close',class:'btn-ghost',onClick:closeModal}]
+  });
+}
+
+// LIVE REPORT (verified only)
+function openLiveReport(){
+  openModal({
+    icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>',
+    iconClass:'info',title:'Live Report Case',subtitle:'Verified users only - priority handling',
+    bodyHtml:`
+      <div class="field">
+        <label>Report type</label>
+        <select id="lrType" style="width:100%;padding:12px;background:var(--bg-3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;outline:none">
+          <option value="">Select type...</option>
+          <option value="Harassment">Harassment</option>
+          <option value="Impersonation">Impersonation</option>
+          <option value="Threat">Threat</option>
+          <option value="Spam">Spam</option>
+          <option value="Privacy">Privacy violation</option>
+          <option value="Other">Other</option>
+        </select>
+        <div class="err" id="lrTypeErr"></div>
+      </div>
+      <div class="field">
+        <label>Username involved (optional)</label>
+        <input type="text" id="lrUsername" placeholder="Username of the person" />
+      </div>
+      <div class="field">
+        <label>Describe the issue</label>
+        <textarea id="lrDesc" rows="4" placeholder="Provide details..."></textarea>
+        <div class="err" id="lrDescErr"></div>
+      </div>
+    `,
+    actions:[{label:'Cancel',class:'btn-ghost',onClick:closeModal},{label:'Submit Case',class:'btn-primary',onClick:async()=>{
+      const type=document.getElementById('lrType').value;
+      const username=document.getElementById('lrUsername').value.trim();
+      const desc=document.getElementById('lrDesc').value.trim();
+      document.getElementById('lrTypeErr').textContent='';
+      document.getElementById('lrDescErr').textContent='';
+      if(!type){document.getElementById('lrTypeErr').textContent='Select a type';return;}
+      if(desc.length<20){document.getElementById('lrDescErr').textContent='At least 20 characters';return;}
+      const reqId=genId('lr_');
+      await db.ref('teamRequests/'+reqId).set({type:'live_report',reporter:currentUser,reportedUser:username,reportType:type,reason:desc,status:'pending',priority:'verified',createdAt:firebase.database.ServerValue.TIMESTAMP});
+      closeModal();
+      toast('Live report case opened. Priority handling.','success');
+    }}]
+  });
+}
+
+// REPORT PEER (in-chat)
+document.getElementById('reportPeerBtn').onclick=()=>{
+  if(!activePeer){toast('No user selected','error');return;}
+  openModal({
+    icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>',
+    iconClass:'danger',title:'Report '+activePeer,subtitle:'AI will review and take action',
+    bodyHtml:`
+      <div class="field">
+        <label>Reason</label>
+        <select id="rpReason" style="width:100%;padding:12px;background:var(--bg-3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;outline:none">
+          <option value="">Select reason...</option>
+          <option value="Spam">Spam</option>
+          <option value="Abuse">Abuse / Harassment</option>
+          <option value="Hate">Hate speech</option>
+          <option value="Threats">Threats</option>
+          <option value="Impersonation">Impersonation</option>
+          <option value="Nudity">Nudity / Sexual content</option>
+          <option value="Other">Other</option>
+        </select>
+        <div class="err" id="rpReasonErr"></div>
+      </div>
+      <div class="field">
+        <label>Additional details (optional)</label>
+        <textarea id="rpDetails" rows="3" placeholder="Any extra context..."></textarea>
+      </div>
+      <div class="ig-reason info">
+        <div class="lbl">AI Review</div>
+        <div class="txt">Our AI examines the report and chat history. If violation confirmed, the user is automatically suspended.</div>
+      </div>
+    `,
+    actions:[{label:'Cancel',class:'btn-ghost',onClick:closeModal},{label:'Submit Report',class:'btn-danger',onClick:async()=>{
+      const reason=document.getElementById('rpReason').value;
+      const details=document.getElementById('rpDetails').value.trim();
+      document.getElementById('rpReasonErr').textContent='';
+      if(!reason){document.getElementById('rpReasonErr').textContent='Select a reason';return;}
+      const reqId=genId('rep_');
+      await db.ref('teamRequests/'+reqId).set({type:'user_report',reporter:currentUser,reportedUser:activePeer,reason:reason,details:details,status:'pending',createdAt:firebase.database.ServerValue.TIMESTAMP});
+      // Trigger AI review
+      await triggerAIReview(reqId);
+      closeModal();
+      toast('Report submitted. AI is reviewing.','success');
+    }}]
   });
 };
 
+// AI REVIEW (client-side simulation - analyzes report and chat)
+async function triggerAIReview(reportId){
+  const reportSnap=await db.ref('teamRequests/'+reportId).get();
+  const report=reportSnap.val();
+  if(!report)return;
+  // Fetch chat history between reporter and reported user
+  const cid=chatIdFor(report.reporter,report.reportedUser);
+  const msgSnap=await db.ref('chats/'+cid+'/messages').orderByKey().limitToLast(50).get();
+  const messages=[];
+  msgSnap.forEach(c=>{const m=c.val();messages.push({sender:m.sender,text:decodeMsg(m.text||''),timestamp:m.timestamp});});
+  // AI analysis - check for violation patterns
+  const violation=analyzeWithAI(report,messages);
+  if(violation.confirmed){
+    // Auto-suspend the reported user
+    const caseId='AI-'+Date.now().toString(36).toUpperCase().slice(-6);
+    await db.ref('users/'+report.reportedUser).update({
+      status:'suspended',
+      suspensionInfo:{
+        reason:'AI-detected: '+violation.reason+' (auto-suspended based on report)',
+        timestamp:firebase.database.ServerValue.TIMESTAMP,
+        caseId:caseId,
+        suspendedBy:'IndoChat AI',
+        autoSuspended:true,
+        reportId:reportId
+      },
+      'appeal/submitted':false,
+      'appeal/captchaPassed':false,
+      'appeal/faceVerification':{left:false,right:false,up:false,down:false},
+      'appeal/faceSnapshots':null
+    });
+    await db.ref('teamRequests/'+reportId).update({
+      status:'approved',
+      aiAnalysis:violation,
+      resolvedAt:firebase.database.ServerValue.TIMESTAMP,
+      resolvedBy:'IndoChat AI',
+      resolutionNote:'Auto-suspended: '+violation.reason
+    });
+  }else{
+    await db.ref('teamRequests/'+reportId).update({
+      aiAnalysis:violation,
+      status:'pending',
+      aiReviewed:true
+    });
+  }
+}
+
+// AI ANALYSIS - checks for violations
+function analyzeWithAI(report,messages){
+  const result={confirmed:false,reason:'',confidence:0,flags:[]};
+  const reportReason=(report.reason||'').toLowerCase();
+  const details=(report.details||'').toLowerCase();
+  // Flag patterns - keywords that indicate violations
+  const abuseWords=['stupid','idiot','hate','kill','die','threat','abuse','harass'];
+  const hateWords=['racist','slur','discriminate'];
+  const spamPatterns=['buy now','click here','free money','earn money','subscribe','follow me'];
+  let score=0;
+  // Analyze chat messages
+  messages.forEach(m=>{
+    const text=(m.text||'').toLowerCase();
+    abuseWords.forEach(w=>{if(text.includes(w)){score+=15;result.flags.push('Abusive language: "'+w+'"');}});
+    hateWords.forEach(w=>{if(text.includes(w)){score+=25;result.flags.push('Hate speech: "'+w+'"');}});
+    spamPatterns.forEach(p=>{if(text.includes(p)){score+=20;result.flags.push('Spam pattern: "'+p+'"');}});
+  });
+  // Analyze report reason
+  if(reportReason==='spam'||reportReason==='abuse'||reportReason==='threats'||reportReason==='hate'){
+    score+=30;
+  }
+  if(details.length>50){score+=10;}
+  // Multiple reports increase confidence
+  result.confidence=Math.min(100,score);
+  if(score>=50){
+    result.confirmed=true;
+    result.reason=result.flags[0]||report.reason;
+  }
+  return result;
+}
+
+// RESET PASSWORD
 function openResetPassword(token){
   openModal({
-    icon:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
-    iconClass:'ok',title:'Set New Password',subtitle:'Enter your new password',
-    bodyHtml:`<div class="field"><label>New password</label><input type="password" id="rpNew" placeholder="At least 6 characters" /></div><div class="field"><label>Confirm password</label><input type="password" id="rpConfirm" placeholder="Re-enter password" /></div>`,
-    actions:[
-      {label:'Cancel',class:'btn-ghost',onClick:closeModal},
-      {label:'Update Password',class:'btn-primary',onClick:async()=>{
-        const n=document.getElementById('rpNew').value;
-        const c=document.getElementById('rpConfirm').value;
-        if(n.length<6){toast('Password must be at least 6 characters','error');return;}
-        if(n!==c){toast('Passwords do not match','error');return;}
-        const snap=await db.ref('resetTokens/'+token).get();
-        if(!snap.exists()){toast('Invalid reset link','error');return;}
-        const t=snap.val();
-        if(t.used){toast('This reset link has already been used','error');return;}
-        if(t.expiresAt<Date.now()){toast('This reset link has expired','error');return;}
-        await db.ref('users/'+t.username+'/password').set(hashPassword(n));
-        await db.ref('users/'+t.username+'/resetUsed').set(true);
-        await db.ref('resetTokens/'+token+'/used').set(true);
-        closeModal();
-        toast('Password updated. You can now sign in.','success');
-      }}
-    ]
+    icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
+    iconClass:'ok',title:'Set New Password',
+    bodyHtml:`<div class="field"><label>New password</label><input type="password" id="rpNew" placeholder="At least 6 characters" /></div><div class="field"><label>Confirm password</label><input type="password" id="rpConfirm" placeholder="Re-enter" /></div>`,
+    actions:[{label:'Cancel',class:'btn-ghost',onClick:closeModal},{label:'Update',class:'btn-primary',onClick:async()=>{
+      const n=document.getElementById('rpNew').value,c=document.getElementById('rpConfirm').value;
+      if(n.length<6){toast('At least 6 characters','error');return;}
+      if(n!==c){toast('Passwords do not match','error');return;}
+      const snap=await db.ref('resetTokens/'+token).get();
+      if(!snap.exists()){toast('Invalid link','error');return;}
+      const t=snap.val();
+      if(t.used){toast('Link already used','error');return;}
+      if(t.expiresAt<Date.now()){toast('Link expired','error');return;}
+      await db.ref('users/'+t.username+'/password').set(hashPassword(n));
+      await db.ref('users/'+t.username+'/resetUsed').set(true);
+      await db.ref('resetTokens/'+token+'/used').set(true);
+      closeModal();
+      toast('Password updated. Sign in.','success');
+    }}]
   });
 }
 (function checkResetToken(){
@@ -889,16 +1093,10 @@ function openResetPassword(token){
   if(token)setTimeout(()=>openResetPassword(token),500);
 })();
 
-document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'&&document.getElementById('mainOverlay').classList.contains('active')){
-    if(!document.getElementById('modalOverlay').classList.contains('active')){
-      e.preventDefault();e.stopPropagation();
-      toast('This window cannot be closed.','info');
-    }
-  }
-});
+// BLOCK ESCAPE ON SUSPENSION
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('mainOverlay').classList.contains('active')&&!document.getElementById('modalOverlay').classList.contains('active')){e.preventDefault();}});
 
-// ============ SUSPENSION ============
+// SUSPENSION OVERLAY
 async function showSuspension(){
   const snap=await currentUserRef.get();
   const data=snap.val();
@@ -910,438 +1108,187 @@ function renderSuspension(info,appeal){
   const card=document.getElementById('mainOverlayCard');
   const alreadySubmitted=appeal.submitted===true;
   card.innerHTML=`
-    <div class="ig-fullscreen">
-      <div class="ig-screen">
-        <div class="ig-screen-icon suspended">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        </div>
-        <div class="ig-screen-title">Account Suspended</div>
-        <div class="ig-screen-desc">Your account has been temporarily suspended. You can submit an appeal to have your case reviewed by our team.</div>
-        <div class="ig-screen-reason suspended">
-          <div class="label">Reason</div>
-          <div class="text">${escapeHtml(info.reason||'Violation of community guidelines.')}</div>
-        </div>
-        <div class="ig-screen-info">
-          <span>Username:</span> ${escapeHtml(currentUser)}<br/>
-          <span>Date:</span> ${formatDateTime(info.timestamp)}<br/>
-          <span>Case ID:</span> ${escapeHtml(info.caseId||'—')}
-        </div>
-        ${alreadySubmitted?`
-          <div class="ig-screen-reason reinstated">
-            <div class="label">Appeal Submitted</div>
-            <div class="text">Your appeal is under review. We'll notify you when a decision is made.</div>
-          </div>
-        `:''}
-        <div class="ig-screen-actions">
-          ${alreadySubmitted?`
-            <button class="btn btn-ghost" id="contactTeamBtn">Contact Team</button>
-          `:`
-            <button class="btn btn-primary" id="startAppealBtn">Submit Appeal</button>
-            <button class="btn btn-text" id="contactTeamBtn">Contact Team</button>
-          `}
-        </div>
-        <div class="ig-screen-note">This window cannot be closed while your account is suspended.</div>
+    <div class="ig-screen">
+      <div class="ig-icon warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+      <div class="ig-title">Account Suspended</div>
+      <div class="ig-desc">Your account has been temporarily suspended. You can submit an appeal.</div>
+      <div class="ig-reason warn"><div class="lbl">Reason</div><div class="txt">${escapeHtml(info.reason||'Violation of guidelines.')}</div></div>
+      <div class="ig-info"><span>Username:</span> ${escapeHtml(currentUser)}<br/><span>Date:</span> ${formatDateTime(info.timestamp)}<br/><span>Case:</span> ${escapeHtml(info.caseId||'—')}</div>
+      ${alreadySubmitted?`<div class="ig-reason ok"><div class="lbl">Appeal Submitted</div><div class="txt">Under review. We'll notify you.</div></div>`:''}
+      <div class="ig-actions">
+        ${alreadySubmitted?'<button class="btn btn-ghost" id="contactTeamBtn">Contact Team</button>':'<button class="btn btn-primary" id="startAppealBtn">Submit Appeal</button><button class="btn btn-text" id="contactTeamBtn">Contact Team</button>'}
       </div>
-    </div>
-  `;
+      <div class="ig-note">This window cannot be closed.</div>
+    </div>`;
   if(!alreadySubmitted)document.getElementById('startAppealBtn').onclick=startAppeal;
   document.getElementById('contactTeamBtn').onclick=openContactTeam;
 }
 
 function openContactTeam(){
   openModal({
-    icon:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
-    iconClass:'info',title:'Contact Moderation Team',subtitle:'Send a message about your case',
-    bodyHtml:`<div class="field"><label>Your message</label><textarea id="ctMessage" rows="4" placeholder="Type your message..." style="width:100%;background:var(--bg-3);border:1px solid var(--border);border-radius:8px;padding:12px 14px;color:var(--text);font-size:14px;outline:none;resize:vertical"></textarea></div><div class="field"><label>Mobile number (for verification)</label><div class="input-wrap" style="position:relative"><span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-2);font-size:14px;font-weight:500;pointer-events:none">+91</span><input type="tel" id="ctMobile" class="with-prefix" placeholder="98765 43210" maxlength="10" style="padding-left:42px" /></div></div>`,
-    actions:[
-      {label:'Cancel',class:'btn-ghost',onClick:closeModal},
-      {label:'Send',class:'btn-primary',onClick:async()=>{
-        const msg=document.getElementById('ctMessage').value.trim();
-        const mobile=sanitizeMobile(document.getElementById('ctMobile').value);
-        if(msg.length<10){toast('Please write a longer message','error');return;}
-        if(mobile.length!==10){toast('Enter a valid mobile','error');return;}
-        const reqId=genId('ct_');
-        await db.ref('teamRequests/'+reqId).set({type:'contact_team',username:currentUser,mobileEntered:mobile,reason:msg,status:'pending',createdAt:firebase.database.ServerValue.TIMESTAMP});
-        closeModal();
-        toast('Message sent.','success');
-      }}
-    ]
+    icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+    iconClass:'info',title:'Contact Team',
+    bodyHtml:`<div class="field"><label>Message</label><textarea id="ctMsg" rows="4" placeholder="Your message..." style="width:100%;background:var(--bg-3);border:1px solid var(--border);border-radius:10px;padding:12px;color:var(--text);outline:none;resize:vertical"></textarea></div><div class="field"><label>Mobile (verification)</label><div class="input-wrap"><span class="prefix">+91</span><input type="tel" id="ctMob" class="with-prefix" placeholder="98765 43210" maxlength="10" /></div></div>`,
+    actions:[{label:'Cancel',class:'btn-ghost',onClick:closeModal},{label:'Send',class:'btn-primary',onClick:async()=>{
+      const msg=document.getElementById('ctMsg').value.trim();
+      const mob=sanitizeMobile(document.getElementById('ctMob').value);
+      if(msg.length<10){toast('Write more','error');return;}
+      if(mob.length!==10){toast('Valid mobile required','error');return;}
+      const reqId=genId('ct_');
+      await db.ref('teamRequests/'+reqId).set({type:'contact_team',username:currentUser,mobileEntered:mob,reason:msg,status:'pending',createdAt:firebase.database.ServerValue.TIMESTAMP});
+      closeModal();toast('Message sent','success');
+    }}]
   });
 }
 
-// ============ APPEAL ============
-let appealCaptcha='';
-let appealStep=0;
-let faceStream=null;
-let faceSteps=['left','right','up','down'];
-let faceStepIndex=0;
-let faceBaselinePos=null;
-let faceMonitor=null;
-let faceModelsLoaded=false;
-let directionHoldMs=0;
-const REQUIRED_HOLD=1500;
+// APPEAL
+let appealCaptcha='',appealStep=0;
+let faceStream=null,faceSteps=['left','right','up','down'],faceStepIndex=0,faceBaseline=null,faceMonitor=null,faceModelsLoaded=false,holdMs=0;
+const HOLD_REQ=1500;
 
-function startAppeal(){
-  appealStep=0;
-  renderAppeal();
-}
+function startAppeal(){appealStep=0;renderAppeal();}
 function renderAppeal(){
   const card=document.getElementById('mainOverlayCard');
   if(appealStep===0){
     appealCaptcha=genCaptcha();
-    card.innerHTML=`
-      <div class="card">
-        <div class="card-head info">
-          <div class="icon-circle info"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
-          <div class="card-title">Human Verification</div>
-          <div class="card-subtitle">Step 1 of 2 — Captcha</div>
-        </div>
-        <div class="card-body">
-          <div class="steps"><div class="step-dot active"></div><div class="step-dot"></div></div>
-          <div class="captcha-box">
-            <label>Enter the characters shown</label>
-            <div class="captcha-canvas" id="captchaCanvas">${appealCaptcha.split('').map(c=>`<span>${c}</span>`).join('')}</div>
-            <input type="text" id="captchaInput" maxlength="6" placeholder="Enter captcha" autocomplete="off" />
-            <div class="refresh-captcha" id="refreshCaptcha"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Refresh</div>
-            <div class="err" id="captchaErr" style="color:var(--danger);font-size:11px;margin-top:6px;min-height:14px"></div>
-          </div>
-        </div>
-        <div class="card-foot">
-          <button class="btn btn-primary" id="verifyCaptchaBtn">Verify & Continue</button>
-          <button class="btn btn-ghost" id="cancelAppeal">Cancel</button>
-        </div>
-      </div>
-    `;
+    card.innerHTML=`<div class="ig-screen"><div class="ig-icon info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><div class="ig-title">Verification</div><div class="ig-desc">Step 1 - Captcha</div><div style="background:var(--bg-3);border-radius:12px;padding:16px;margin-bottom:16px"><div class="captcha-canvas">${appealCaptcha.split('').map(c=>'<span>'+c+'</span>').join('')}</div><input type="text" id="captchaInput" maxlength="6" placeholder="Enter captcha" style="width:100%;padding:11px;background:var(--bg-2);border:1px solid var(--border);border-radius:8px;color:var(--text);text-align:center;letter-spacing:4px;font-weight:600;text-transform:uppercase;font-family:monospace;outline:none" /><div class="err" id="captchaErr" style="color:var(--danger);font-size:11px;margin-top:4px"></div></div><div class="ig-actions"><button class="btn btn-primary" id="verifyCaptchaBtn">Continue</button><button class="btn btn-ghost" id="cancelAppeal">Cancel</button></div></div>`;
     document.getElementById('captchaInput').focus();
-    document.getElementById('refreshCaptcha').onclick=()=>{appealCaptcha=genCaptcha();document.getElementById('captchaCanvas').innerHTML=appealCaptcha.split('').map(c=>`<span>${c}</span>`).join('');document.getElementById('captchaInput').value='';document.getElementById('captchaErr').textContent='';};
-    document.getElementById('captchaInput').addEventListener('keypress',e=>{if(e.key==='Enter')document.getElementById('verifyCaptchaBtn').click();});
     document.getElementById('verifyCaptchaBtn').onclick=verifyCaptcha;
     document.getElementById('cancelAppeal').onclick=()=>{stopCamera();showSuspension();};
   }else if(appealStep===1){
-    card.innerHTML=`
-      <div class="card">
-        <div class="card-head info">
-          <div class="icon-circle info"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg></div>
-          <div class="card-title">Face Verification</div>
-          <div class="card-subtitle">Step 2 of 2 — Auto-Capture</div>
-        </div>
-        <div class="card-body">
-          <div class="steps"><div class="step-dot done"></div><div class="step-dot active"></div></div>
-          <div class="face-step">
-            <div class="info-banner">AI face detection is active. Look in the requested direction and hold for 1.5 seconds. The snapshot auto-captures when the correct direction is held. Wrong directions are rejected.</div>
-            <div class="face-video-wrap" id="faceVideoWrap">
-              <video id="faceVideo" autoplay playsinline muted></video>
-              <canvas class="face-overlay-canvas" id="faceOverlayCanvas"></canvas>
-              <div class="face-overlay-frame"></div>
-              <div class="face-scan-line"></div>
-              <div class="capture-flash" id="captureFlash"></div>
-              <div class="face-loading" id="faceLoading"><div class="spinner"></div><div id="loadingText">Loading AI models...</div></div>
-            </div>
-            <div class="dir-arrow" id="dirArrow"></div>
-            <div class="dir-text" id="dirText">Look to your LEFT</div>
-            <div class="dir-progress" id="dirProgress"></div>
-            <div class="auto-bar"><div class="auto-fill" id="autoFill"></div></div>
-            <div class="motion-status" id="motionStatus">Initializing...</div>
-            <button class="btn btn-ghost" id="cancelFace" style="margin-top:12px">Cancel</button>
-          </div>
-        </div>
-      </div>
-    `;
-    renderDirProgress();
+    card.innerHTML=`<div class="ig-screen"><div class="ig-icon info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></div><div class="ig-title">Face Verification</div><div class="ig-desc">Look in each direction. Auto-captures after 1.5s hold.</div><div class="info-banner">AI face detection active. Hold the correct direction to auto-capture.</div><div class="face-wrap" id="faceWrap"><video id="faceVideo" autoplay playsinline muted></video><canvas class="face-overlay" id="faceCanvas"></canvas><div class="face-flash" id="faceFlash"></div><div class="face-loading" id="faceLoading"><div class="spinner"></div><div id="loadingText">Loading AI...</div></div></div><div class="dir-arrow" id="dirArrow"></div><div class="dir-text" id="dirText"></div><div class="dir-steps" id="dirSteps"></div><div class="auto-bar"><div class="auto-fill" id="autoFill"></div></div><div class="motion-status" id="motionStatus">Initializing...</div><button class="btn btn-ghost" id="cancelFace" style="margin-top:12px">Cancel</button></div>`;
+    renderDir();
     startCamera();
     document.getElementById('cancelFace').onclick=()=>{stopCamera();showSuspension();};
   }
 }
-function genCaptcha(){const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<6;i++)s+=chars.charAt(Math.floor(Math.random()*chars.length));return s;}
+function genCaptcha(){const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<6;i++)s+=c.charAt(Math.floor(Math.random()*c.length));return s;}
 function verifyCaptcha(){
   const input=document.getElementById('captchaInput').value.toUpperCase().trim();
-  const errEl=document.getElementById('captchaErr');
-  if(input===appealCaptcha){errEl.textContent='';appealStep=1;renderAppeal();}
-  else{errEl.textContent='Incorrect captcha. Try again.';appealCaptcha=genCaptcha();document.getElementById('captchaCanvas').innerHTML=appealCaptcha.split('').map(c=>`<span>${c}</span>`).join('');document.getElementById('captchaInput').value='';document.getElementById('captchaInput').focus();}
+  const e=document.getElementById('captchaErr');
+  if(input===appealCaptcha){appealStep=1;renderAppeal();}
+  else{e.textContent='Incorrect. Try again.';appealCaptcha=genCaptcha();document.querySelector('.captcha-canvas').innerHTML=appealCaptcha.split('').map(c=>'<span>'+c+'</span>').join('');document.getElementById('captchaInput').value='';document.getElementById('captchaInput').focus();}
 }
-function renderDirProgress(){
-  const wrap=document.getElementById('dirProgress');
-  if(!wrap)return;
+function renderDir(){
   const icons={left:'\u2190',right:'\u2192',up:'\u2191',down:'\u2193'};
-  wrap.innerHTML=faceSteps.map((s,i)=>{let cls='';if(i<faceStepIndex)cls='done';else if(i===faceStepIndex)cls='active';return `<div class="dir-step ${cls}">${icons[s]}</div>`;}).join('');
-  const arrow=icons[faceSteps[faceStepIndex]];
-  const txt='Look to your '+faceSteps[faceStepIndex].toUpperCase();
-  if(document.getElementById('dirArrow'))document.getElementById('dirArrow').textContent=arrow;
-  if(document.getElementById('dirText'))document.getElementById('dirText').textContent=txt;
+  const wrap=document.getElementById('dirSteps');
+  if(!wrap)return;
+  wrap.innerHTML=faceSteps.map((s,i)=>{let cls='';if(i<faceStepIndex)cls='done';else if(i===faceStepIndex)cls='active';return '<div class="dir-step '+cls+'">'+icons[s]+'</div>';}).join('');
+  if(document.getElementById('dirArrow'))document.getElementById('dirArrow').textContent=icons[faceSteps[faceStepIndex]];
+  if(document.getElementById('dirText'))document.getElementById('dirText').textContent='Look '+faceSteps[faceStepIndex].toUpperCase();
 }
-
-// ============ FACE TRACKING ============
-async function loadFaceModels(){
-  if(faceModelsLoaded)return;
-  const MODEL_URL='https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights';
-  await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
-  faceModelsLoaded=true;
-}
+async function loadFaceModels(){if(faceModelsLoaded)return;await faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights');faceModelsLoaded=true;}
 async function startCamera(){
-  directionHoldMs=0;
-  faceBaselinePos=null;
-  const loading=document.getElementById('faceLoading');
-  const loadingText=document.getElementById('loadingText');
-  const st=document.getElementById('motionStatus');
+  holdMs=0;faceBaseline=null;
+  const loading=document.getElementById('faceLoading'),lt=document.getElementById('loadingText'),st=document.getElementById('motionStatus');
   try{
-    if(loadingText)loadingText.textContent='Loading AI face detection models...';
-    if(st){st.textContent='Loading AI models...';st.className='motion-status';}
+    if(lt)lt.textContent='Loading AI models...';
+    if(st)st.textContent='Loading AI...';
     await loadFaceModels();
-    if(loadingText)loadingText.textContent='Requesting camera access...';
-    if(st){st.textContent='Requesting camera...';st.className='motion-status';}
+    if(lt)lt.textContent='Requesting camera...';
+    if(st)st.textContent='Requesting camera...';
     faceStream=await navigator.mediaDevices.getUserMedia({video:{width:320,height:240,facingMode:'user'}});
     const v=document.getElementById('faceVideo');
     v.srcObject=faceStream;
-    v.addEventListener('loadedmetadata',()=>{
-      if(loading)loading.style.display='none';
-      if(st){st.textContent='Detecting your face...';st.className='motion-status';}
-      faceMonitor=setInterval(trackFace,200);
-    },{once:true});
-  }catch(e){
-    console.error('Camera error:',e);
-    if(loading)loading.innerHTML='<div style="color:var(--danger);font-size:12px;padding:20px;text-align:center">'+escapeHtml(e.message||'Camera error')+'<br/><br/><button class="btn btn-ghost" style="padding:8px 16px" onclick="startCamera()">Retry</button></div>';
-    if(st){st.textContent='Error: '+(e.message||'Camera access denied');st.className='motion-status error';}
-  }
+    v.addEventListener('loadedmetadata',()=>{if(loading)loading.style.display='none';if(st)st.textContent='Detecting face...';faceMonitor=setInterval(trackFace,200);},{once:true});
+  }catch(e){if(loading)loading.innerHTML='<div style="color:var(--danger);font-size:12px;padding:16px;text-align:center">'+escapeHtml(e.message)+'<br/><br/><button class="btn btn-ghost" style="padding:8px 16px" onclick="startCamera()">Retry</button></div>';if(st)st.textContent='Error';}
 }
 async function trackFace(){
   if(!faceStream||!faceModelsLoaded)return;
   const v=document.getElementById('faceVideo');
   if(!v||!v.videoWidth)return;
   try{
-    const detection=await faceapi.detectSingleFace(v,new faceapi.TinyFaceDetectorOptions({inputSize:224,scoreThreshold:0.5}));
-    const st=document.getElementById('motionStatus');
-    const fill=document.getElementById('autoFill');
-    if(!detection){
-      if(st){st.textContent='No face detected. Position your face in the circle.';st.className='motion-status error';}
-      if(fill)fill.style.width='0%';
-      directionHoldMs=0;
-      faceBaselinePos=null;
-      const canvas=document.getElementById('faceOverlayCanvas');
-      if(canvas){const ctx=canvas.getContext('2d');ctx.clearRect(0,0,canvas.width,canvas.height);}
-      return;
-    }
-    const box=detection.box;
-    const cx=box.x+box.width/2;
-    const cy=box.y+box.height/2;
-    drawFaceBox(box);
-    if(!faceBaselinePos){
-      faceBaselinePos={x:cx,y:cy};
-      if(st){st.textContent='Face detected. Now look '+faceSteps[faceStepIndex].toUpperCase()+' and hold.';st.className='motion-status ready';}
-      directionHoldMs=0;
-      return;
-    }
-    const dx=cx-faceBaselinePos.x;
-    const dy=cy-faceBaselinePos.y;
-    const THRESHOLD=25;
-    const requested=faceSteps[faceStepIndex];
-    let detectedDir=null;
-    if(Math.abs(dx)>Math.abs(dy)){
-      if(dx>THRESHOLD)detectedDir='left';
-      else if(dx<-THRESHOLD)detectedDir='right';
-    }else{
-      if(dy<-THRESHOLD)detectedDir='up';
-      else if(dy>THRESHOLD)detectedDir='down';
-    }
-    if(detectedDir===requested){
-      directionHoldMs+=200;
-      const pct=Math.min(100,Math.round(directionHoldMs/REQUIRED_HOLD*100));
-      if(fill){fill.style.width=pct+'%';if(pct>=100)fill.classList.add('complete');else fill.classList.remove('complete');}
-      const remaining=Math.max(0,Math.ceil((REQUIRED_HOLD-directionHoldMs)/1000));
-      if(st){st.textContent=remaining>0?'Hold still... capturing in '+remaining+'s':'Capturing...';st.className='motion-status ready';}
-      if(directionHoldMs>=REQUIRED_HOLD)autoCaptureFace();
-    }else{
-      directionHoldMs=0;
-      if(fill){fill.style.width='0%';fill.classList.remove('complete');}
-      if(detectedDir){if(st){st.textContent='Wrong direction. You looked '+detectedDir.toUpperCase()+'. Look '+requested.toUpperCase()+'.';st.className='motion-status wrong';}}
-      else{if(st){st.textContent='Look '+requested.toUpperCase()+' and hold for 1.5 seconds.';st.className='motion-status';}}
-    }
-  }catch(e){console.error('Track error:',e);}
+    const d=await faceapi.detectSingleFace(v,new faceapi.TinyFaceDetectorOptions({inputSize:224,scoreThreshold:0.5}));
+    const st=document.getElementById('motionStatus'),fill=document.getElementById('autoFill');
+    if(!d){if(st){st.textContent='No face detected';st.className='motion-status error';}if(fill)fill.style.width='0%';holdMs=0;faceBaseline=null;const c=document.getElementById('faceCanvas');if(c)c.getContext('2d').clearRect(0,0,c.width,c.height);return;}
+    const box=d.box,cx=box.x+box.width/2,cy=box.y+box.height/2;
+    drawBox(box);
+    if(!faceBaseline){faceBaseline={x:cx,y:cy};if(st){st.textContent='Face detected. Look '+faceSteps[faceStepIndex].toUpperCase();st.className='motion-status ready';}holdMs=0;return;}
+    const dx=cx-faceBaseline.x,dy=cy-faceBaseline.y,T=25,req=faceSteps[faceStepIndex];
+    let dir=null;
+    if(Math.abs(dx)>Math.abs(dy)){if(dx>T)dir='left';else if(dx<-T)dir='right';}
+    else{if(dy<-T)dir='up';else if(dy>T)dir='down';}
+    if(dir===req){holdMs+=200;const pct=Math.min(100,Math.round(holdMs/HOLD_REQ*100));if(fill){fill.style.width=pct+'%';if(pct>=100)fill.classList.add('complete');else fill.classList.remove('complete');}const r=Math.max(0,Math.ceil((HOLD_REQ-holdMs)/1000));if(st){st.textContent=r>0?'Hold... '+r+'s':'Capturing...';st.className='motion-status ready';}if(holdMs>=HOLD_REQ)autoCapture();}
+    else{holdMs=0;if(fill){fill.style.width='0%';fill.classList.remove('complete');}if(dir){if(st){st.textContent='Wrong: '+dir.toUpperCase()+'. Look '+req.toUpperCase()+'.';st.className='motion-status wrong';}}else{if(st){st.textContent='Look '+req.toUpperCase()+' and hold.';st.className='motion-status';}}}
+  }catch(e){}
 }
-function drawFaceBox(box){
-  const canvas=document.getElementById('faceOverlayCanvas');
-  if(!canvas)return;
-  const v=document.getElementById('faceVideo');
-  if(!v||!v.videoWidth)return;
-  if(canvas.width!==v.clientWidth||canvas.height!==v.clientHeight){canvas.width=v.clientWidth;canvas.height=v.clientHeight;}
-  const ctx=canvas.getContext('2d');
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  const scaleX=canvas.width/v.videoWidth;
-  const scaleY=canvas.height/v.videoHeight;
-  const x=(v.videoWidth-box.x-box.width)*scaleX;
-  const y=box.y*scaleY;
-  const w=box.width*scaleX;
-  const h=box.height*scaleY;
-  const cornerLen=Math.min(w,h)*0.2;
-  ctx.strokeStyle='#0095f6';
-  ctx.lineWidth=3;
-  ctx.lineCap='round';
-  ctx.beginPath();
-  ctx.moveTo(x,y+cornerLen);ctx.lineTo(x,y);ctx.lineTo(x+cornerLen,y);
-  ctx.moveTo(x+w-cornerLen,y);ctx.lineTo(x+w,y);ctx.lineTo(x+w,y+cornerLen);
-  ctx.moveTo(x+w,y+h-cornerLen);ctx.lineTo(x+w,y+h);ctx.lineTo(x+w-cornerLen,y+h);
-  ctx.moveTo(x+cornerLen,y+h);ctx.lineTo(x,y+h);ctx.lineTo(x,y+h-cornerLen);
+function drawBox(box){
+  const c=document.getElementById('faceCanvas');if(!c)return;const v=document.getElementById('faceVideo');if(!v||!v.videoWidth)return;
+  if(c.width!==v.clientWidth||c.height!==v.clientHeight){c.width=v.clientWidth;c.height=v.clientHeight;}
+  const ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);
+  const sx=c.width/v.videoWidth,sy=c.height/v.videoHeight;
+  const x=(v.videoWidth-box.x-box.width)*sx,y=box.y*sy,w=box.width*sx,h=box.height*sy,cl=Math.min(w,h)*0.2;
+  ctx.strokeStyle='#0095f6';ctx.lineWidth=3;ctx.lineCap='round';ctx.beginPath();
+  ctx.moveTo(x,y+cl);ctx.lineTo(x,y);ctx.lineTo(x+cl,y);
+  ctx.moveTo(x+w-cl,y);ctx.lineTo(x+w,y);ctx.lineTo(x+w,y+cl);
+  ctx.moveTo(x+w,y+h-cl);ctx.lineTo(x+w,y+h);ctx.lineTo(x+w-cl,y+h);
+  ctx.moveTo(x+cl,y+h);ctx.lineTo(x,y+h);ctx.lineTo(x,y+h-cl);
   ctx.stroke();
 }
-function autoCaptureFace(){
-  const v=document.getElementById('faceVideo');
-  if(!v||!v.srcObject)return;
-  const canvas=document.createElement('canvas');
-  canvas.width=280;canvas.height=280;
-  const ctx=canvas.getContext('2d');
-  ctx.translate(canvas.width,0);ctx.scale(-1,1);
-  ctx.drawImage(v,0,0,canvas.width,canvas.height);
-  const dataUrl=canvas.toDataURL('image/jpeg',0.7);
+function autoCapture(){
+  const v=document.getElementById('faceVideo');if(!v||!v.srcObject)return;
+  const c=document.createElement('canvas');c.width=280;c.height=280;const ctx=c.getContext('2d');
+  ctx.translate(c.width,0);ctx.scale(-1,1);ctx.drawImage(v,0,0,c.width,c.height);
+  const url=c.toDataURL('image/jpeg',0.7);
   const dir=faceSteps[faceStepIndex];
   currentUserRef.child('appeal/faceVerification/'+dir).set(true);
-  currentUserRef.child('appeal/faceSnapshots/'+dir).set(dataUrl);
-  const flash=document.getElementById('captureFlash');
-  if(flash){flash.classList.add('flashing');setTimeout(()=>flash.classList.remove('flashing'),600);}
-  toast('Captured: looking '+dir,'success');
-  faceBaselinePos=null;
-  directionHoldMs=0;
-  const fill=document.getElementById('autoFill');
-  if(fill){fill.style.width='0%';fill.classList.remove('complete');}
-  const st=document.getElementById('motionStatus');
-  if(st){st.textContent='Detecting face for next direction...';st.className='motion-status';}
+  currentUserRef.child('appeal/faceSnapshots/'+dir).set(url);
+  const flash=document.getElementById('faceFlash');if(flash){flash.classList.add('flashing');setTimeout(()=>flash.classList.remove('flashing'),500);}
+  toast('Captured: '+dir,'success');
+  faceBaseline=null;holdMs=0;
+  const fill=document.getElementById('autoFill');if(fill){fill.style.width='0%';fill.classList.remove('complete');}
+  const st=document.getElementById('motionStatus');if(st){st.textContent='Next direction...';st.className='motion-status';}
   faceStepIndex++;
   if(faceStepIndex>=faceSteps.length)finishAppeal();
-  else renderDirProgress();
+  else renderDir();
 }
-function stopCamera(){
-  if(faceMonitor){clearInterval(faceMonitor);faceMonitor=null;}
-  if(faceStream){faceStream.getTracks().forEach(t=>t.stop());faceStream=null;}
-  faceBaselinePos=null;
-  directionHoldMs=0;
-}
-async function finishAppeal(){
-  stopCamera();
-  await currentUserRef.child('appeal').update({submitted:true,captchaPassed:true,submittedAt:firebase.database.ServerValue.TIMESTAMP});
-  showSuspension();
-  toast('Appeal submitted successfully.','success');
-}
+function stopCamera(){if(faceMonitor){clearInterval(faceMonitor);faceMonitor=null;}if(faceStream){faceStream.getTracks().forEach(t=>t.stop());faceStream=null;}faceBaseline=null;holdMs=0;}
+async function finishAppeal(){stopCamera();await currentUserRef.child('appeal').update({submitted:true,captchaPassed:true,submittedAt:firebase.database.ServerValue.TIMESTAMP});showSuspension();toast('Appeal submitted','success');}
 
-// ============ REINSTATED ============
+// REINSTATED
 async function showReinstated(){
   stopCamera();
-  const snap=await currentUserRef.get();
-  const data=snap.val();
-  const info=data.suspensionInfo||{};
+  const snap=await currentUserRef.get();const data=snap.val();const info=data.suspensionInfo||{};
   const card=document.getElementById('mainOverlayCard');
   document.getElementById('mainOverlay').classList.add('active');
-  card.innerHTML=`
-    <div class="ig-fullscreen">
-      <div class="ig-screen">
-        <div class="ig-screen-icon reinstated">
-          <div class="pulse"></div>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
-        <div class="ig-screen-title">You're Back</div>
-        <div class="ig-screen-desc">Your appeal has been reviewed and your account has been reinstated. Welcome back to IndoChat.</div>
-        <div class="ig-guidelines">
-          <h4>Guidelines to Follow</h4>
-          <ul>
-            <li>Be respectful — no harassment, threats, or hate speech.</li>
-            <li>No spam or unsolicited promotional messages.</li>
-            <li>Do not impersonate others or share false information.</li>
-            <li>Respect privacy — never share personal data without consent.</li>
-            <li>Report suspicious or abusive behaviour to the team.</li>
-            <li>Repeated violations may result in permanent disabling.</li>
-          </ul>
-        </div>
-        <div class="ig-screen-info">
-          <span>Username:</span> ${escapeHtml(currentUser)}<br/>
-          <span>Reinstated:</span> ${formatDateTime(info.reviewedAt||Date.now())}<br/>
-          <span>Reviewed by:</span> ${escapeHtml(info.reviewedBy||'IndoChat Team')}
-        </div>
-        <div class="ig-screen-actions">
-          <button class="btn btn-ok" id="continueBtn">Continue to IndoChat</button>
-        </div>
-        <div class="ig-screen-note">Please follow the guidelines to avoid future suspension.</div>
-      </div>
-    </div>
-  `;
+  card.innerHTML=`<div class="ig-screen"><div class="ig-icon ok"><div class="pulse"></div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ig-title">You're Back</div><div class="ig-desc">Your appeal was reviewed and your account has been reinstated.</div><div class="ig-reason ok"><div class="lbl">Guidelines</div><div class="txt" style="font-size:12px">Be respectful. No spam, harassment, or impersonation. Respect privacy. Repeated violations may result in permanent disabling.</div></div><div class="ig-info"><span>Username:</span> ${escapeHtml(currentUser)}<br/><span>Reinstated:</span> ${formatDateTime(info.reviewedAt||Date.now())}</div><div class="ig-actions"><button class="btn btn-ok" id="continueBtn">Continue</button></div></div>`;
   document.getElementById('continueBtn').onclick=async()=>{
     await currentUserRef.child('status').set('active');
     await currentUserRef.child('suspensionInfo').remove();
     await currentUserRef.child('appeal').set({submitted:false,captchaPassed:false,faceVerification:{left:false,right:false,up:false,down:false}});
-    closeMainOverlay();
-    toast('Welcome back!','success');
+    closeMainOverlay();toast('Welcome back','success');
   };
 }
 
-// ============ DISABLED ============
+// DISABLED
 async function showDisabled(){
   stopCamera();
-  const snap=await currentUserRef.get();
-  const data=snap.val();
-  const info=data.disableInfo||data.suspensionInfo||{};
-  const recovery=data.recoveryRequest||{};
+  const snap=await currentUserRef.get();const data=snap.val();const info=data.disableInfo||data.suspensionInfo||{};const recovery=data.recoveryRequest||{};
   const card=document.getElementById('mainOverlayCard');
   document.getElementById('mainOverlay').classList.add('active');
-  const recoverySubmitted=recovery.submitted===true;
-  card.innerHTML=`
-    <div class="ig-fullscreen">
-      <div class="ig-screen">
-        <div class="ig-screen-icon disabled">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
-        </div>
-        <div class="ig-screen-title">Account Disabled</div>
-        <div class="ig-screen-desc">Your account has been permanently disabled for violating our guidelines. You may submit one recovery request.</div>
-        <div class="ig-screen-reason disabled">
-          <div class="label">Reason</div>
-          <div class="text">${escapeHtml(info.disableReason||info.reason||'Severe or repeated violations of community guidelines.')}</div>
-        </div>
-        <div class="ig-screen-info">
-          <span>Username:</span> ${escapeHtml(currentUser)}<br/>
-          <span>Date:</span> ${formatDateTime(info.disabledAt)}<br/>
-          <span>Case ID:</span> ${escapeHtml(info.caseId||'—')}<br/>
-          <span>Reviewed by:</span> ${escapeHtml(info.reviewedBy||'IndoChat Team')}
-        </div>
-        ${recoverySubmitted?`
-          <div class="ig-screen-reason reinstated">
-            <div class="label">Recovery Request Submitted</div>
-            <div class="text">Your recovery request is under investigation. We'll notify you when a decision is made.</div>
-          </div>
-        `:''}
-        <div class="ig-screen-actions">
-          ${recoverySubmitted?`
-            <button class="btn btn-ghost" id="contactTeamBtn">Contact Team</button>
-          `:`
-            <button class="btn btn-primary" id="requestRecoveryBtn">Request Account Recovery</button>
-            <button class="btn btn-text" id="contactTeamBtn">Contact Team</button>
-          `}
-        </div>
-        <div class="ig-screen-note">Recovery is not guaranteed. The team verifies your mobile number.</div>
-      </div>
-    </div>
-  `;
-  if(!recoverySubmitted)document.getElementById('requestRecoveryBtn').onclick=openRecoveryForm;
+  const rs=recovery.submitted===true;
+  card.innerHTML=`<div class="ig-screen"><div class="ig-icon danger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></div><div class="ig-title">Account Disabled</div><div class="ig-desc">Your account has been permanently disabled. You may submit one recovery request.</div><div class="ig-reason danger"><div class="lbl">Reason</div><div class="txt">${escapeHtml(info.disableReason||info.reason||'Severe violations.')}</div></div><div class="ig-info"><span>Username:</span> ${escapeHtml(currentUser)}<br/><span>Date:</span> ${formatDateTime(info.disabledAt)}<br/><span>Case:</span> ${escapeHtml(info.caseId||'—')}</div>${rs?`<div class="ig-reason ok"><div class="lbl">Recovery Submitted</div><div class="txt">Under investigation.</div></div>`:''}<div class="ig-actions">${rs?'<button class="btn btn-ghost" id="contactTeamBtn">Contact Team</button>':'<button class="btn btn-primary" id="requestRecoveryBtn">Request Recovery</button><button class="btn btn-text" id="contactTeamBtn">Contact Team</button>'}</div></div>`;
+  if(!rs)document.getElementById('requestRecoveryBtn').onclick=openRecoveryForm;
   document.getElementById('contactTeamBtn').onclick=openContactTeam;
 }
-
 function openRecoveryForm(){
   openModal({
-    icon:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9"/><polyline points="3 4 3 12 11 12"/></svg>',
-    iconClass:'info',title:'Account Recovery Request',subtitle:'The team will verify your mobile number',
-    bodyHtml:`<div class="meta-box"><div class="meta-row"><span class="k">Username</span><span class="v">${escapeHtml(currentUser)}</span></div></div><div class="field"><label>Mobile number attached to this account</label><div class="input-wrap" style="position:relative"><span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-2);font-size:14px;font-weight:500;pointer-events:none">+91</span><input type="tel" id="rcMobile" class="with-prefix" placeholder="98765 43210" maxlength="10" style="padding-left:42px" /></div><div class="hint">Must match the mobile number you registered with.</div></div><div class="field"><label>Why should your account be recovered?</label><textarea id="rcReason" rows="4" placeholder="Explain what happened..." style="width:100%;background:var(--bg-3);border:1px solid var(--border);border-radius:8px;padding:12px 14px;color:var(--text);font-size:14px;outline:none;resize:vertical"></textarea></div>`,
-    actions:[
-      {label:'Cancel',class:'btn-ghost',onClick:closeModal},
-      {label:'Submit Recovery Request',class:'btn-primary',onClick:async()=>{
-        const m=sanitizeMobile(document.getElementById('rcMobile').value);
-        const r=document.getElementById('rcReason').value.trim();
-        if(m.length!==10){toast('Enter a valid 10-digit mobile','error');return;}
-        if(r.length<10){toast('Please provide a detailed explanation','error');return;}
-        const reqId=genId('rc_');
-        await db.ref('users/'+currentUser+'/recoveryRequest').set({submitted:true,mobileEntered:m,reason:r,submittedAt:firebase.database.ServerValue.TIMESTAMP,requestId:reqId,status:'pending'});
-        await db.ref('teamRequests/'+reqId).set({type:'account_recovery',username:currentUser,mobileEntered:m,reason:r,status:'pending',createdAt:firebase.database.ServerValue.TIMESTAMP});
-        closeModal();
-        showDisabled();
-        toast('Recovery request submitted.','success');
-      }}
-    ]
+    icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9"/><polyline points="3 4 3 12 11 12"/></svg>',
+    iconClass:'info',title:'Account Recovery',
+    bodyHtml:`<div class="field"><label>Mobile number</label><div class="input-wrap"><span class="prefix">+91</span><input type="tel" id="rcMob" class="with-prefix" placeholder="98765 43210" maxlength="10" /></div><div class="hint">Must match registered mobile.</div></div><div class="field"><label>Why should you be recovered?</label><textarea id="rcReason" rows="4" placeholder="Explain..." style="width:100%;background:var(--bg-3);border:1px solid var(--border);border-radius:10px;padding:12px;color:var(--text);outline:none;resize:vertical"></textarea></div>`,
+    actions:[{label:'Cancel',class:'btn-ghost',onClick:closeModal},{label:'Submit',class:'btn-primary',onClick:async()=>{
+      const m=sanitizeMobile(document.getElementById('rcMob').value),r=document.getElementById('rcReason').value.trim();
+      if(m.length!==10){toast('Valid mobile required','error');return;}
+      if(r.length<10){toast('Write more detail','error');return;}
+      const reqId=genId('rc_');
+      await db.ref('users/'+currentUser+'/recoveryRequest').set({submitted:true,mobileEntered:m,reason:r,submittedAt:firebase.database.ServerValue.TIMESTAMP,requestId:reqId,status:'pending'});
+      await db.ref('teamRequests/'+reqId).set({type:'account_recovery',username:currentUser,mobileEntered:m,reason:r,status:'pending',createdAt:firebase.database.ServerValue.TIMESTAMP});
+      closeModal();showDisabled();toast('Recovery request submitted','success');
+    }}]
   });
 }
 
+// AUTO-LOGIN
 (async()=>{
   const saved=localStorage.getItem('indochat_user');
   if(saved){
@@ -1349,16 +1296,7 @@ function openRecoveryForm(){
     if(snap.exists()){
       const d=snap.val();
       if(d.status!=='disabled')enterChat(saved);
-      else{
-        currentUser=saved;currentUserRef=db.ref('users/'+saved);
-        setTimeout(()=>{
-          document.getElementById('authScreen').style.display='none';
-          document.getElementById('chatApp').classList.add('active');
-          document.getElementById('meName').textContent=saved;
-          document.getElementById('meAvatar').textContent=saved.charAt(0).toUpperCase();
-          showDisabled();
-        },100);
-      }
+      else{currentUser=saved;currentUserRef=db.ref('users/'+saved);setTimeout(()=>{document.getElementById('authScreen').style.display='none';document.getElementById('chatApp').classList.add('active');showDisabled();},100);}
     }else localStorage.removeItem('indochat_user');
   }
 })();
